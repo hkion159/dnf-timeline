@@ -668,7 +668,7 @@ async function getTimelineItemDetails(allItemIds) {
             let html = "";
             for (const item of items) {
                 const validityClass = item.isValid ? 'valid-true' : 'valid-false';
-                const validityText = item.isValid ? '유효' : '무효';
+                const validityText = item.isValid ? '유효' : '중복';
 
                 html += `
                     <tr class="${item.setClass}">
@@ -754,6 +754,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
