@@ -180,7 +180,7 @@ let filteredTimelinePages = [];
         // 🚨 아이템 획득 시점까지의 세트 부위 점유 상태를 추적하는 객체
 // Key: "세트이름-희귀도" (예: "세렌디피티 세트-에픽")
 // Value: Set 객체로, 이미 획득한 슬롯 부위 이름들을 저장합니다.
-const setSlotTracker = {};
+let setSlotTracker = {};
 
         // 🚨 희귀도 순위 정의 (높을수록 낮은 순위 값) 🚨
 // 비교를 위해 순위를 부여합니다.
@@ -399,6 +399,8 @@ async function getTimelineItemDetails(allItemIds) {
                 // 1. 캐릭터 ID 가져오기
                 statusEl.textContent = "캐릭터 ID 조회 중...";
                 const characterId = await getCharacterId(characterName);
+
+                resetGlobalData();
                 
                 // 2. 모든 타임라인 데이터 가져오기 (월별)
                 const allTimelineRows = await getAllTimelinePages(characterId);
@@ -408,6 +410,8 @@ async function getTimelineItemDetails(allItemIds) {
                     searchBtn.disabled = false;
                     return;
                 }
+
+                
 
                 // 3. 타임라인 처리 (오래된 순으로 정렬)
                 statusEl.textContent = "타임라인 처리 중... (아이템 상세 정보 조회)";
@@ -654,6 +658,17 @@ function filterTimeline() {
     displayResults();
 }
 
+        function resetGlobalData() {
+ allTimelinePages = [];
+ filteredTimelinePages = [];
+        
+        // 🚨 아이템 획득 시점까지의 세트 부위 점유 상태를 추적하는 객체
+// Key: "세트이름-희귀도" (예: "세렌디피티 세트-에픽")
+// Value: Set 객체로, 이미 획득한 슬롯 부위 이름들을 저장합니다.
+ setSlotTracker = {};
+
+        }
+
         // ------------------------------------------------------------------
 // 🚨 DOM 로드 후 이벤트 리스너 연결 🚨
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -668,6 +683,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
