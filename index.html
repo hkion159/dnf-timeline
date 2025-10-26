@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>던파 아이템 유효성 검사기</title>
+    <title>던파 득템 유효성 검사기</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
@@ -170,7 +170,7 @@
     </label>
     </div>
 
-        <p id="totalRowCount" style="font-weight: bold; margin: 10px 0;">총 행 수: 0</p>
+        <p id="totalRowCount" style="font-weight: bold; margin: 10px 0;">총 타임라인 수: 0</p>
 
         <div id="infoNotice" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; color: #333; border-radius: 4px;">
     <strong>✅ 유효 확률 계산 안내</strong>
@@ -682,7 +682,7 @@ async function getTimelineItemDetails(allItemIds) {
             const rowCountElement = document.getElementById('totalRowCount'); // 🚨 새로운 요소 가져오기 🚨
             // 3. 총 행 수 업데이트
     if (rowCountElement) {
-        rowCountElement.textContent = `총 행 수: ${items.length}`;
+        rowCountElement.textContent = `총 타임라인 수: ${items.length}`;
     }
             
         }
@@ -748,6 +748,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
