@@ -113,8 +113,10 @@
 
     <script>
         // --- 설정 및 상수 ---
-
-        const API_KEY = "ZyFEefejKEugYnK8kL5EBT5a81YqeAbz"; // 제공된 API 키
+// *** 프록시 서버의 기본 경로를 정의합니다. ***
+// Vercel에 배포된 경우, /api/proxy는 api/proxy.js 서버리스 함수로 연결됩니다.
+const PROXY_BASE_URL = "/api/proxy/df"; // Neople API의 /df 이전 경로를 프록시로 지정
+        
         const SERVER_ID = "cain";
         
         // 아이템 등급 우선순위 (높을수록 좋음)
@@ -134,7 +136,7 @@
 
         // 1. 캐릭터 ID 조회
         async function getCharacterId(characterName) {
-            const url = `https://api.neople.co.kr/df/servers/${SERVER_ID}/characters?apikey=${API_KEY}&characterName=${encodeURIComponent(characterName)}`;
+            const url = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters?characterName=${encodeURIComponent(characterName)}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error("캐릭터 ID 조회 실패");
             const data = await response.json();
@@ -158,7 +160,7 @@
 
                 statusEl.textContent = `${currentMonthStart.getFullYear()}년 ${currentMonthStart.getMonth() + 1}월 타임라인 조회 중...`;
                 
-                const url = `https://api.neople.co.kr/df/servers/${SERVER_ID}/characters/${characterId}/timeline?apikey=${API_KEY}&limit=100&code=505,507,513&startDate=${startDateStr}&endDate=${endDateStr}`;
+                const url = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters/${characterId}/timeline?limit=100&code=505,507,513&startDate=${startDateStr}&endDate=${endDateStr}`;
                 
                 try {
                     const response = await fetch(url);
@@ -184,7 +186,7 @@
                 return itemDetailCache.get(itemId);
             }
             
-            const url = `https://api.neople.co.kr/df/items/${itemId}?apikey=${API_KEY}`;
+            const url = `${PROXY_BASE_URL}/items/${itemId}`;
             try {
                 const response = await fetch(url);
                 if (!response.ok) return null; // 조회 실패 시 null 반환
@@ -332,3 +334,4 @@
 
 </body>
 </html>
+
