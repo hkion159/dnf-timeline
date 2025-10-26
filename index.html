@@ -496,6 +496,7 @@ async function getTimelineItemDetails(allItemIds) {
                     let styleClass = ''; // 새로 추가된 스타일 변수
                 let resultClass = 'result-normal';
                     let roundedProbability = 0;
+                    let resultText = '';
                     
                     // 2. 슬롯 추적기 구조: setSlotTracker[setName] = Map<Rarity, Set<SlotName>>
                         if (!setSlotTracker[setItemName]) {
@@ -721,6 +722,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
