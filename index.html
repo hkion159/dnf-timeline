@@ -140,6 +140,16 @@
         <input type="checkbox" id="filterLegendary" value="레전더리" onchange="filterTimeline()" checked> 레전더리
     </label>
     </div>
+
+        <p id="totalRowCount" style="font-weight: bold; margin: 10px 0;">총 행 수: 0</p>
+
+        <div id="infoNotice" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; color: #333; border-radius: 4px;">
+    <strong>✅ 유효 확률 계산 안내</strong>
+    <p style="margin-top: 5px; margin-bottom: 0; font-size: 0.95em;">
+    이 표는 **무기** 및 **고유를 제외한** 타임라인을 모두 보여줍니다. 
+    '유효 확률'은 해당 아이템을 획득할 **당시**를 기준으로 유효 부위 확률입니다.
+    </p>
+</div>
         
         <div id="status"></div>
         <table class="results-table">
@@ -598,6 +608,14 @@ async function getTimelineItemDetails(allItemIds) {
                 `;
             }
             resultsEl.innerHTML = html;
+
+            const rowCountElement = document.getElementById('totalRowCount'); // 🚨 새로운 요소 가져오기 🚨
+            let totalRows = 0; // 🚨 총 행 수 카운터 초기화 🚨
+            // 3. 총 행 수 업데이트
+    if (rowCountElement) {
+        rowCountElement.textContent = `총 행 수: ${items.size}`;
+    }
+            
         }
 
         // 날짜를 'YYYYMMDD' 형식의 문자열로 변환
@@ -650,6 +668,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
