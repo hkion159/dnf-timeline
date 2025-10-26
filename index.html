@@ -112,6 +112,8 @@
     </div>
 
     <script>
+        
+        const itemDetailsCache = {};
         // --- 설정 및 상수 ---
 // *** 프록시 서버의 기본 경로를 정의합니다. ***
 // Vercel에 배포된 경우, /api/proxy는 api/proxy.js 서버리스 함수로 연결됩니다.
@@ -179,6 +181,18 @@ const PROXY_BASE_URL = "/api/proxy/df"; // Neople API의 /df 이전 경로를 �
                 // 다음 달로 이동
                 currentMonthStart = nextMonthStart;
             }
+
+            const allItemIds = [];
+    allTimelineRows.forEach(row => {
+            if (row.data && row.data.itemId) {
+                // itemId가 쉼표로 분리되어 있을 수 있으므로 모두 추출
+                const ids = row.data.itemId.split(',').map(id => id.trim()).filter(id => id.length > 0);
+                allItemIds.push(...ids);
+            }
+        });
+
+    // 수집된 모든 아이템 ID에 대해 다중 조회 함수 호출
+    await getTimelineItemDetails(allItemIds);
             return allTimelineRows;
         }
 
@@ -187,6 +201,71 @@ function formatToApiTime(date) {
     const hh = String(date.getHours()).padStart(2, '0');
     const mm = String(date.getMinutes()).padStart(2, '0');
     return `T${hh}${mm}`;
+}
+
+        // 기존: getItemDetails(itemId)를 대체하는 함수
+// 타임라인에서 필요한 모든 아이템 ID 목록을 받아 정보를 조회하고 캐시에 저장합니다.
+async function getTimelineItemDetails(allItemIds) {
+    const uniqueItemIds = Array.from(new Set(allItemIds));
+    const itemIdsToFetch = [];
+    
+    // 1. 캐시 확인 및 조회할 목록 분류
+    for (const itemId of uniqueItemIds) {
+        if (!itemDetailsCache[itemId]) {
+            itemIdsToFetch.push(itemId); // 캐시에 없는 아이템만 조회 목록에 추가
+        }
+    }
+
+    if (itemIdsToFetch.length === 0) {
+        console.log("[Multi-Fetch] All items found in cache.");
+        return; // 조회할 아이템이 없으면 종료
+    }
+
+    console.log(`[Multi-Fetch] Need to fetch ${itemIdsToFetch.length} items.`);
+
+    // 2. 아이템 ID를 최대 15개씩 묶어 API 호출
+    const CHUNK_SIZE = 15;
+    const fetchPromises = [];
+
+    for (let i = 0; i < itemIdsToFetch.length; i += CHUNK_SIZE) {
+        const chunk = itemIdsToFetch.slice(i, i + CHUNK_SIZE);
+        const itemIdsParam = chunk.join(','); // 아이템 ID들을 콤마로 연결
+
+        // 다중 조회 API URL
+        const url = `${PROXY_BASE_URL}/multi/items?itemIds=${encodeURIComponent(itemIdsParam)}`;
+        
+        // 프록시 서버에 요청을 보내고 Promise를 배열에 저장
+        fetchPromises.push(
+            fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`다중 아이템 조회 실패: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 3. 응답 데이터를 파싱하여 캐시에 저장
+                if (data.rows) {
+                    for (const itemData of data.rows) {
+                        const itemId = itemData.itemId;
+                        const details = {
+                            slotName: itemData.itemTypeDetail, // 부위 정보로 사용
+                            setName: itemData.setItem ? itemData.setItem.setItemName : '없음',
+                            setItemId: itemData.setItem ? itemData.setItem.setItemId : null
+                        };
+                        itemDetailsCache[itemId] = details; // 캐시 업데이트
+                    }
+                }
+            })
+            .catch(error => {
+                console.error(`아이템 묶음 조회 중 오류 발생: ${error.message}`);
+                // 오류 발생 시 해당 아이템들의 캐시 항목은 undefined로 남습니다.
+            })
+        );
+    }
+
+    // 4. 모든 API 호출이 완료될 때까지 기다립니다.
+    await Promise.all(fetchPromises);
 }
 
         // 3. 아이템 상세 정보 조회 (캐시 사용)
@@ -344,6 +423,7 @@ function formatToApiTime(date) {
 
 </body>
 </html>
+
 
 
 
