@@ -153,6 +153,15 @@
 // Key: "세트이름-희귀도" (예: "세렌디피티 세트-에픽")
 // Value: Set 객체로, 이미 획득한 슬롯 부위 이름들을 저장합니다.
 const setSlotTracker = {};
+
+        // 🚨 희귀도 순위 정의 (높을수록 낮은 순위 값) 🚨
+// 비교를 위해 순위를 부여합니다.
+const RARITY_RANK = {
+    '태초': 1,
+    '에픽': 2,
+    '레전더리': 3 
+    // 무기는 제외, 나머지 희귀도는 VALID_RARITIES에서 제외
+};
         
         // 전체 세트 부위 수 (무기 제외 11개)
 const TOTAL_SET_SLOTS = 11; 
@@ -395,26 +404,32 @@ async function getTimelineItemDetails(allItemIds) {
                     let probabilityContent = '';
                     let styleClass = ''; // 새로 추가된 스타일 변수
                     
-            // 2. 추적 키 정의 (세트 이름과 희귀도)
-                        // 태초/에픽은 세트 아이템으로 간주하여 하나의 카테고리로 묶음.
-                        // 레전더리는 세트명이 있어도 11개 슬롯의 유효 여부만 따지는 단순한 확률로 간주
-                        let trackerKey = '';
-                        if (itemRarity === '레전더리') {
-                            // 레전더리는 별도의 트래킹 없이 항상 11/11로 처리하거나,
-                            // (요청에 따라) 전체 부위에서 유효 확률만 남은 것으로 처리
-                            trackerKey = `레전더리-${setItemName || '단일'}`;
-                        } else { // 태초, 에픽 (세트템)
-                            trackerKey = `${setItemName}-${itemRarity}`;
+                    // 2. 슬롯 추적기 구조: setSlotTracker[setName] = Map<Rarity, Set<SlotName>>
+                        if (!setSlotTracker[setItemName]) {
+                            setSlotTracker[setItemName] = {};
                         }
-                        
-                        // 3. 슬롯 트래커 초기화
-                        if (!setSlotTracker[trackerKey]) {
-                            setSlotTracker[trackerKey] = new Set();
+                        if (!setSlotTracker[setItemName][itemRarity]) {
+                            setSlotTracker[setItemName][itemRarity] = new Set();
                         }
-                        
-                        // 4. 현재 획득한 부위 개수 확인
-                        const currentCount = setSlotTracker[trackerKey].size;
-                        
+
+                        // 3. 현재 희귀도의 순위 확인
+                        const targetRank = RARITY_RANK[itemRarity];
+                        let filledSlotCount = 0;
+                        const countedSlots = new Set(); // 중복 부위 카운트를 막기 위한 Set
+
+                        // 4. 이미 채워진 부위 카운트 (순위가 같거나 더 높은 희귀도만 카운트)
+                        // '더 높은 희귀도'는 순위 값이 '더 낮거나 같은' 경우입니다.
+                        for (const r in RARITY_RANK) {
+                            if (RARITY_RANK[r] <= targetRank) {
+                                if (setSlotTracker[setItemName][r]) {
+                                    setSlotTracker[setItemName][r].forEach(slot => {
+                                        countedSlots.add(slot);
+                                    });
+                                }
+                            }
+                        }
+                        filledSlotCount = countedSlots.size;
+                    
                         // 5. 확률 계산
                         if (currentCount < TOTAL_SET_SLOTS) {
                             // 남은 유효 부위 개수: 11 - 현재 획득한 부위 개수
@@ -441,10 +456,8 @@ async function getTimelineItemDetails(allItemIds) {
                             styleClass = 'prob-low'; // 0%는 가장 낮은 구간으로 설정
                         }
                         
-                        // 6. 슬롯 트래커 업데이트 (이미 획득한 것으로 표시)
-                        // 주의: 이 아이템의 확률을 계산한 후, 다음 아이템 계산을 위해 해당 부위를 추가합니다.
-                        // (이 부위는 이미 타임라인에 떴으므로 다음 획득 확률 계산 시 제외되어야 함)
-                        setSlotTracker[trackerKey].add(itemTypeDetail);
+                        // 6. 슬롯 트래커 업데이트 (확률 계산 후, 현재 아이템 부위를 추가)
+                        setSlotTracker[setItemName][itemRarity].add(itemTypeDetail);
                     
                     // 현재 획득한 아이템 등급이 이전에 획득한 최고 등급보다 높아야 유효
                     if (currentRarityScore > highestRarityScore) {
@@ -521,6 +534,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 </body>
 </html>
+
 
 
 
