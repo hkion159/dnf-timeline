@@ -431,9 +431,9 @@ async function getTimelineItemDetails(allItemIds) {
                         filledSlotCount = countedSlots.size;
                     
                         // 5. 확률 계산
-                        if (currentCount < TOTAL_SET_SLOTS) {
+                        if (filledSlotCount < TOTAL_SET_SLOTS) {
                             // 남은 유효 부위 개수: 11 - 현재 획득한 부위 개수
-                            const remainingValidSlots = TOTAL_SET_SLOTS - currentCount;
+                            const remainingValidSlots = TOTAL_SET_SLOTS - filledSlotCount;
                             const probability = (remainingValidSlots / TOTAL_SET_SLOTS) * 100;
 
                             // 소수점 첫째 자리에서 반올림
@@ -534,6 +534,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 </body>
 </html>
+
 
 
 
