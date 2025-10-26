@@ -153,10 +153,13 @@ const PROXY_BASE_URL = "/api/proxy/df"; // Neople API의 /df 이전 경로를 �
             while (currentMonthStart <= today) {
                 // 다음 달 1일 계산
                 let nextMonthStart = new Date(currentMonthStart.getFullYear(), currentMonthStart.getMonth() + 1, 1);
+                if (nextMonthStart > today) {
+                    nextMonthStart = today;
+                }
                 
                 // 날짜 포맷팅 (YYYYMMDD)
                 const startDateStr = formatDate(currentMonthStart);
-                const endDateStr = formatDate(nextMonthStart);
+                const endDateStr = nextMonthStart === today ? formatDate(nextMonthStart) + formatToApiTime(nextMonthStart) : formatDate(nextMonthStart);
 
                 statusEl.textContent = `${currentMonthStart.getFullYear()}년 ${currentMonthStart.getMonth() + 1}월 타임라인 조회 중...`;
                 
@@ -178,6 +181,13 @@ const PROXY_BASE_URL = "/api/proxy/df"; // Neople API의 /df 이전 경로를 �
             }
             return allTimelineRows;
         }
+
+// ⚠️ 추가: API가 요구하는 hhmm 형식으로 시간을 포맷하는 헬퍼 함수
+function formatToApiTime(date) {
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    return `T${hh}${mm}`;
+}
 
         // 3. 아이템 상세 정보 조회 (캐시 사용)
         const itemDetailCache = new Map();
@@ -334,4 +344,5 @@ const PROXY_BASE_URL = "/api/proxy/df"; // Neople API의 /df 이전 경로를 �
 
 </body>
 </html>
+
 
