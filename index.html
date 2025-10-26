@@ -449,7 +449,7 @@ async function getTimelineItemDetails(allItemIds) {
                         if (itemRarity === '태초' && !TAECHO_SLOTS.includes(slot)) {
                             return; // 태초가 아닌 부위는 카운트하지 않음
                         }
-                                        countedSlots.add(itemTypeDetail);
+                                        countedSlots.add(slot);
                                     });
                                 }
                             }
@@ -576,6 +576,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 </body>
 </html>
+
 
 
 
