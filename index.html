@@ -141,6 +141,11 @@
     background-color: transparent;
     color: inherit;
 }
+        /* 장착 중인 세트 아이템 행 강조 스타일 */
+        .highlight-set {
+            background-color: #fffacd; /* 연한 노란색 */
+            font-weight: bold;
+        }
         
     </style>
 </head>
@@ -170,8 +175,9 @@
         <div id="infoNotice" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; color: #333; border-radius: 4px;">
     <strong>✅ 유효 확률 계산 안내</strong>
     <p style="margin-top: 5px; margin-bottom: 0; font-size: 0.95em;">
-    이 표는 **무기** 및 **고유를 제외한** 타임라인을 모두 보여줍니다. 
-    '유효 확률'은 해당 아이템을 획득할 **당시**를 기준으로 유효 부위 확률입니다.
+    이 표는 **무기** 및 **고유를 제외한** 타임라인을 모두 보여줍니다. <br/>
+    '유효 확률'은 해당 아이템을 획득할 **당시**를 기준으로 유효 부위 확률입니다. <br/>
+        운은 **먹었을 때의 결과운**을 의미합니다. 많거나 적게 뜬다는 의미가 아닙니다.
     </p>
 </div>
         
@@ -267,6 +273,16 @@ function handleEnterKey(event) {
             const data = await response.json();
             if (!data.rows || data.rows.length === 0) throw new Error("캐릭터를 찾을 수 없습니다.");
             return data.rows[0].characterId;
+        }
+
+        // 1.5. 캐릭터 set 조회
+        async function getCharacterEquipment(characterId) {
+            const url = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters/${characterId}/equip/equipment`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("캐릭터 장비 조회 실패");
+            const data = await response.json();
+            if (!data.rows || data.rows.length === 0) throw new Error("캐릭터를 찾을 수 없습니다.");
+            return data.equipment.find(e=>e.setItemName)?.setItemName;
         }
 
         // 2. 타임라인 조회 (월별로 반복 호출)
@@ -427,6 +443,8 @@ async function getTimelineItemDetails(allItemIds) {
 
                 resetGlobalData();
                 
+                const set = await getCharacterEquipment(characterId);
+                
                 // 2. 모든 타임라인 데이터 가져오기 (월별)
                 const allTimelineRows = await getAllTimelinePages(characterId);
                 
@@ -586,6 +604,10 @@ async function getTimelineItemDetails(allItemIds) {
                                 resultText = '나만운없어';
                             }   
 
+                    let setClass = '';
+                    if (set === setItemName) {
+                        setClass = 'highlight-set';
+                }
                     processedItems.push({
                         date: dropDate,
                         itemName: dropData.itemName,
@@ -597,7 +619,8 @@ async function getTimelineItemDetails(allItemIds) {
                         styleClass: styleClass,
                         style: itemStyle,
                         resultClass: resultClass,
-                        resultText: resultText
+                        resultText: resultText,
+                        setClass: setClass
                     });
                 }
 
@@ -638,7 +661,7 @@ async function getTimelineItemDetails(allItemIds) {
                 const validityText = item.isValid ? '유효' : '무효';
 
                 html += `
-                    <tr>
+                    <tr class="${item.setClass}">
                         <td>${item.date}</td>
                         <td style="${item.style}">${item.itemName}</td>
                         <td style="${item.style}">${item.rarity}</td>
@@ -721,6 +744,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
