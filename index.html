@@ -402,9 +402,9 @@ async function getTimelineItemDetails(allItemIds) {
                         if (itemRarity === '레전더리') {
                             // 레전더리는 별도의 트래킹 없이 항상 11/11로 처리하거나,
                             // (요청에 따라) 전체 부위에서 유효 확률만 남은 것으로 처리
-                            trackerKey = `레전더리-${setName || '단일'}`;
+                            trackerKey = `레전더리-${setItemName || '단일'}`;
                         } else { // 태초, 에픽 (세트템)
-                            trackerKey = `${setName}-${itemRarity}`;
+                            trackerKey = `${setItemName}-${itemRarity}`;
                         }
                         
                         // 3. 슬롯 트래커 초기화
@@ -521,6 +521,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 </body>
 </html>
+
 
 
 
