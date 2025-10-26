@@ -281,7 +281,7 @@ function handleEnterKey(event) {
             const response = await fetch(url);
             if (!response.ok) throw new Error("캐릭터 장비 조회 실패");
             const data = await response.json();
-            if (!data.rows || data.rows.length === 0) throw new Error("캐릭터 장비 조회를 실패했습니다.");
+            if (!data.equipment || data.equipment.length === 0) throw new Error("캐릭터 장비 조회를 실패했습니다.");
             return data.equipment.find(e=>e.setItemName)?.setItemName;
         }
 
@@ -744,6 +744,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
