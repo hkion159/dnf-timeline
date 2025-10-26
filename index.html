@@ -444,7 +444,7 @@ async function getTimelineItemDetails(allItemIds) {
                         // 6. 슬롯 트래커 업데이트 (이미 획득한 것으로 표시)
                         // 주의: 이 아이템의 확률을 계산한 후, 다음 아이템 계산을 위해 해당 부위를 추가합니다.
                         // (이 부위는 이미 타임라인에 떴으므로 다음 획득 확률 계산 시 제외되어야 함)
-                        setSlotTracker[trackerKey].add(slotName);
+                        setSlotTracker[trackerKey].add(itemTypeDetail);
                     
                     // 현재 획득한 아이템 등급이 이전에 획득한 최고 등급보다 높아야 유효
                     if (currentRarityScore > highestRarityScore) {
@@ -521,6 +521,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 </body>
 </html>
+
 
 
 
