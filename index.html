@@ -177,7 +177,7 @@
     <p style="margin-top: 5px; margin-bottom: 0; font-size: 0.95em;">
         <ul>
     <li>이 표는 <b>무기</b> 및 <b>고유를 제외한</b> 타임라인을 모두 보여줍니다. <br/></li>
-    <li>항아리, 업그레이드, 초월 등은 <b>제외</b>입니다. (랜덤 드랍만 보여줌)<br/></li>
+    <li>항아리, 업그레이드, 초월 등은 <b>제외</b>입니다. (확률 계산엔 포함시킴) (랜덤 드랍만 보여줌)<br/></li>
     <li>'유효 확률'은 해당 아이템을 획득할 <b>당시</b>를 기준으로 그 세트의 유효 <b>부위</b> 확률입니다. <br/></li>
     <li>운은 먹었을 때의 결과운을 의미합니다. 많거나 적게 뜬다는 의미가 아닙니다. <br/></li>
     <li>재미로 만든거라 DB 는 안 붙여서 매번 다시 조회해서 비효율적입니다.</li>
@@ -308,13 +308,21 @@ function handleEnterKey(event) {
 
                 statusEl.textContent = `${currentMonthStart.getFullYear()}년 ${currentMonthStart.getMonth() + 1}월 타임라인 조회 중...`;
                 
-                const url = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters/${characterId}/timeline?limit=100&code=505,507,513&startDate=${startDateStr}&endDate=${endDateStr}`;
+                const url = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters/${characterId}/timeline?limit=100&code=505,507,513,504,511,516,514&startDate=${startDateStr}&endDate=${endDateStr}`;
                 
                 try {
                     const response = await fetch(url);
                     const data = await response.json();
                     if (data.timeline && data.timeline.rows) {
                         allTimelineRows.push(...data.timeline.rows);
+                    }
+                    if (data.timeline.next) {
+                        const urlNext = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters/${characterId}/timeline?next=${data.timeline.next}`;
+                    const responseNext = await fetch(urlNext);
+                    const dataNext = await responseNext.json();
+                    if (dataNext.timeline && dataNext.timeline.rows) {
+                        allTimelineRows.push(...dataNext.timeline.rows);
+                    }
                     }
                 } catch (e) {
                     console.error(`${startDateStr} 타임라인 조회 실패:`, e);
@@ -478,6 +486,7 @@ async function getTimelineItemDetails(allItemIds) {
                     const itemId = dropData.itemId;
                     const itemRarity = dropData.itemRarity;
                     const dropDate = itemDrop.date;
+                    const code = itemDrop.code;
 
                     // 3-1. 아이템 상세 정보 조회
                     const details = itemDetailsCache[itemId];
@@ -632,7 +641,8 @@ async function getTimelineItemDetails(allItemIds) {
                         style: itemStyle,
                         resultClass: resultClass,
                         resultText: resultText,
-                        setClass: setClass
+                        setClass: setClass,
+                        code: code
                     });
                 }
 
@@ -726,7 +736,7 @@ function filterTimeline() {
     }
 
     // 2. 전체 데이터를 순회하며 필터링
-    filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity));
+    filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => [505,507,513].includes(row.code));
 
     displayResults();
 }
@@ -756,6 +766,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
