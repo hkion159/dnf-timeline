@@ -131,13 +131,13 @@
         
         <div id="rarityFilters" style="margin-top: 15px;">
     <label>
-        <input type="checkbox" id="filterTaecho" value="태초" onchange="filterTimeline()"> 태초
+        <input type="checkbox" id="filterTaecho" value="태초" onchange="filterTimeline()" checked> 태초
     </label>
     <label>
-        <input type="checkbox" id="filterEpic" value="에픽" onchange="filterTimeline()"> 에픽
+        <input type="checkbox" id="filterEpic" value="에픽" onchange="filterTimeline()" checked> 에픽
     </label>
     <label>
-        <input type="checkbox" id="filterLegendary" value="레전더리" onchange="filterTimeline()"> 레전더리
+        <input type="checkbox" id="filterLegendary" value="레전더리" onchange="filterTimeline()" checked> 레전더리
     </label>
     </div>
         
@@ -612,8 +612,7 @@ async function getTimelineItemDetails(allItemIds) {
  * 체크박스 상태에 따라 타임라인 데이터를 필터링하고 노출합니다.
  */
 function filterTimeline() {
-    const tableBody = document.querySelector('#resultsContainer tbody');
-    if (!allTimelinePages || allTimelinePages.length === 0 || !tableBody) {
+    if (!allTimelinePages || allTimelinePages.length === 0) {
         return; // 데이터가 없거나 테이블이 준비되지 않았으면 종료
     }
     
@@ -628,8 +627,6 @@ function filterTimeline() {
         tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">선택된 아이템 등급이 없습니다.</td></tr>';
         return;
     }
-
-    const filteredPages = [];
 
     // 2. 전체 데이터를 순회하며 필터링
     filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity));
@@ -649,6 +646,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
