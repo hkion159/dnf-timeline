@@ -334,7 +334,7 @@ async function getTimelineItemDetails(allItemIds) {
                     const dropDate = itemDrop.date;
 
                     // 3-1. 아이템 상세 정보 조회
-                    const details = await getItemDetails(itemId);
+                    const details = itemDetailsCache[itemId];
 
                     // 3-2. 유효성 검사: 115레벨이 아니거나, 세트 아이템이 아니면 무시
                     if (!details || details.itemAvailableLevel !== 115 || !details.setItemName) {
@@ -423,6 +423,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 </body>
 </html>
+
 
 
 
