@@ -150,7 +150,7 @@ const PROXY_BASE_URL = "/api/proxy/df"; // Neople API의 /df 이전 경로를 �
             let currentMonthStart = new Date('2025-01-01');
             const today = new Date();
 
-            while (currentMonthStart <= today) {
+            while (currentMonthStart < today) {
                 // 다음 달 1일 계산
                 let nextMonthStart = new Date(currentMonthStart.getFullYear(), currentMonthStart.getMonth() + 1, 1);
                 if (nextMonthStart > today) {
@@ -344,5 +344,6 @@ function formatToApiTime(date) {
 
 </body>
 </html>
+
 
 
