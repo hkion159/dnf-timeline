@@ -399,6 +399,24 @@ async function getTimelineItemDetails(allItemIds) {
                     const highestRarityScore = highestAcquiredRarity[itemKey] || 0;
 
                     let isValid = false;
+                    
+                    // 🚨 희귀도별 스타일을 저장할 변수 🚨
+                    let itemStyle = '';
+
+                    // 1. 아이템 희귀도에 따른 스타일 결정
+                        if (itemRarity === '레전더리') {
+                            itemStyle = 'color: rgb(239, 112, 0);';
+                        } else if (itemRarity === '에픽') {
+                            itemStyle = 'color: rgb(239, 169, 0);';
+                        } else if (itemRarity === '태초') {
+                            // 그라데이션은 CSS background로 적용하는 것이 일반적이나, 
+                            // 텍스트에만 적용하려면 웹킷(WebKit) 속성을 사용해야 합니다.
+                            // 여기서는 텍스트 색상을 설정하고, 셀 배경에 적용하는 방식으로 처리하겠습니다.
+                            itemStyle = 'color: #3057a6; font-weight: bold; background-image: linear-gradient(180deg, #55e95b, #3057a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;';
+                            // ⚠️ 주의: 웹킷(Chrome, Safari) 브라우저에서만 정상적으로 텍스트 그라데이션이 보입니다.
+                        } else {
+                            itemStyle = ''; // 기타 희귀도는 기본 스타일
+                        }
 
                 
                     let probabilityContent = '';
@@ -473,7 +491,8 @@ async function getTimelineItemDetails(allItemIds) {
                         slot: itemTypeDetail,
                         isValid: isValid,
                         probabilityContent: probabilityContent,
-                        styleClass: styleClass
+                        styleClass: styleClass,
+                        style: itemStyle
                     });
                 }
 
@@ -511,8 +530,8 @@ async function getTimelineItemDetails(allItemIds) {
                 html += `
                     <tr>
                         <td>${item.date}</td>
-                        <td>${item.itemName}</td>
-                        <td>${item.rarity}</td>
+                        <td style="${item.style}">${item.itemName}</td>
+                        <td style="${item.style}">${item.rarity}</td>
                         <td>${item.setName}</td>
                         <td>${item.slot}</td>
                         <td class="probability-cell ${item.styleClass}">${item.probabilityContent}</td>
@@ -534,6 +553,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 </body>
 </html>
+
 
 
 
