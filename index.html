@@ -84,6 +84,39 @@
         .valid-false {
             color: #dc3545;
         }
+        /* 확률 셀 스타일 */
+.probability-cell {
+    font-weight: bold;
+    text-align: center !important;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* 4구간 스타일 정의 (0%~100%) */
+
+/* 구간 1: 0% ~ 25% (가장 낮은 확률, 나쁨 - 빨강/주황) */
+.prob-low {
+    background-color: #ff9999; /* 밝은 빨강 */
+    color: #800000;
+}
+
+/* 구간 2: 26% ~ 50% (보통 - 노랑) */
+.prob-mid-low {
+    background-color: #ffda6a; /* 노란색 */
+    color: #995c00;
+}
+
+/* 구간 3: 51% ~ 75% (좋음 - 연두) */
+.prob-mid-high {
+    background-color: #b3e6b3; /* 밝은 녹색 */
+    color: #004d00;
+}
+
+/* 구간 4: 76% ~ 100% (가장 높은 확률, 매우 좋음 - 파랑/초록) */
+.prob-high {
+    background-color: #8cd98c; /* 진한 녹색 */
+    color: #003300;
+}
     </style>
 </head>
 <body>
@@ -103,6 +136,7 @@
                     <th>등급</th>
                     <th>세트</th>
                     <th>부위</th>
+                    <th>유효 확률</th>
                     <th>유효 여부</th>
                 </tr>
             </thead>
@@ -112,8 +146,19 @@
     </div>
 
     <script>
-        
+        // 전역 캐시 객체: 아이템 ID를 키(Key)로, 아이템 상세 정보를 값(Value)으로 저장
         const itemDetailsCache = {};
+        
+        // 🚨 아이템 획득 시점까지의 세트 부위 점유 상태를 추적하는 객체
+// Key: "세트이름-희귀도" (예: "세렌디피티 세트-에픽")
+// Value: Set 객체로, 이미 획득한 슬롯 부위 이름들을 저장합니다.
+const setSlotTracker = {};
+        
+        // 전체 세트 부위 수 (무기 제외 11개)
+const TOTAL_SET_SLOTS = 11; 
+// 유효 희귀도 목록
+const VALID_RARITIES = ['태초', '에픽', '레전더리'];
+        
         // --- 설정 및 상수 ---
 // *** 프록시 서버의 기본 경로를 정의합니다. ***
 // Vercel에 배포된 경우, /api/proxy는 api/proxy.js 서버리스 함수로 연결됩니다.
@@ -345,6 +390,61 @@ async function getTimelineItemDetails(allItemIds) {
                     const highestRarityScore = highestAcquiredRarity[itemKey] || 0;
 
                     let isValid = false;
+
+                
+                    let probabilityContent = '';
+                    let styleClass = ''; // 새로 추가된 스타일 변수
+                    
+            // 2. 추적 키 정의 (세트 이름과 희귀도)
+                        // 태초/에픽은 세트 아이템으로 간주하여 하나의 카테고리로 묶음.
+                        // 레전더리는 세트명이 있어도 11개 슬롯의 유효 여부만 따지는 단순한 확률로 간주
+                        let trackerKey = '';
+                        if (rarity === '레전더리') {
+                            // 레전더리는 별도의 트래킹 없이 항상 11/11로 처리하거나,
+                            // (요청에 따라) 전체 부위에서 유효 확률만 남은 것으로 처리
+                            trackerKey = `레전더리-${setName || '단일'}`;
+                        } else { // 태초, 에픽 (세트템)
+                            trackerKey = `${setName}-${rarity}`;
+                        }
+                        
+                        // 3. 슬롯 트래커 초기화
+                        if (!setSlotTracker[trackerKey]) {
+                            setSlotTracker[trackerKey] = new Set();
+                        }
+                        
+                        // 4. 현재 획득한 부위 개수 확인
+                        const currentCount = setSlotTracker[trackerKey].size;
+                        
+                        // 5. 확률 계산
+                        if (currentCount < TOTAL_SET_SLOTS) {
+                            // 남은 유효 부위 개수: 11 - 현재 획득한 부위 개수
+                            const remainingValidSlots = TOTAL_SET_SLOTS - currentCount;
+                            const probability = (remainingValidSlots / TOTAL_SET_SLOTS) * 100;
+
+                            // 소수점 첫째 자리에서 반올림
+                            const roundedProbability = Math.round(probability); 
+                            probabilityContent = `${roundedProbability}%`;
+
+                            // 🚨 확률 구간에 따른 스타일 클래스 결정 🚨
+                            if (roundedProbability <= 25) {
+                                styleClass = 'prob-low';
+                            } else if (roundedProbability <= 50) {
+                                styleClass = 'prob-mid-low';
+                            } else if (roundedProbability <= 75) {
+                                styleClass = 'prob-mid-high';
+                            } else { // 76% ~ 100%
+                                styleClass = 'prob-high';
+                            }
+                        } else {
+                            // 이미 11부위를 다 채운 경우
+                            probabilityContent = '0%';
+                            styleClass = 'prob-low'; // 0%는 가장 낮은 구간으로 설정
+                        }
+                        
+                        // 6. 슬롯 트래커 업데이트 (이미 획득한 것으로 표시)
+                        // 주의: 이 아이템의 확률을 계산한 후, 다음 아이템 계산을 위해 해당 부위를 추가합니다.
+                        // (이 부위는 이미 타임라인에 떴으므로 다음 획득 확률 계산 시 제외되어야 함)
+                        setSlotTracker[trackerKey].add(slotName);
                     
                     // 현재 획득한 아이템 등급이 이전에 획득한 최고 등급보다 높아야 유효
                     if (currentRarityScore > highestRarityScore) {
@@ -358,7 +458,9 @@ async function getTimelineItemDetails(allItemIds) {
                         rarity: itemRarity,
                         setName: setItemName,
                         slot: itemTypeDetail,
-                        isValid: isValid
+                        isValid: isValid,
+                        probabilityContent: probabilityContent,
+                        styleClass: styleClass
                     });
                 }
 
@@ -392,7 +494,7 @@ async function getTimelineItemDetails(allItemIds) {
             for (const item of items) {
                 const validityClass = item.isValid ? 'valid-true' : 'valid-false';
                 const validityText = item.isValid ? '유효' : '무효';
-                
+
                 html += `
                     <tr>
                         <td>${item.date}</td>
@@ -400,6 +502,7 @@ async function getTimelineItemDetails(allItemIds) {
                         <td>${item.rarity}</td>
                         <td>${item.setName}</td>
                         <td>${item.slot}</td>
+                        <td class="probability-cell ${item.styleClass}">${item.probabilityContent}</td>
                         <td class="${validityClass}">${validityText}</td>
                     </tr>
                 `;
@@ -418,6 +521,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 </body>
 </html>
+
 
 
 
