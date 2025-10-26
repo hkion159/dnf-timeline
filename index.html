@@ -399,12 +399,12 @@ async function getTimelineItemDetails(allItemIds) {
                         // 태초/에픽은 세트 아이템으로 간주하여 하나의 카테고리로 묶음.
                         // 레전더리는 세트명이 있어도 11개 슬롯의 유효 여부만 따지는 단순한 확률로 간주
                         let trackerKey = '';
-                        if (rarity === '레전더리') {
+                        if (itemRarity === '레전더리') {
                             // 레전더리는 별도의 트래킹 없이 항상 11/11로 처리하거나,
                             // (요청에 따라) 전체 부위에서 유효 확률만 남은 것으로 처리
                             trackerKey = `레전더리-${setName || '단일'}`;
                         } else { // 태초, 에픽 (세트템)
-                            trackerKey = `${setName}-${rarity}`;
+                            trackerKey = `${setName}-${itemRarity}`;
                         }
                         
                         // 3. 슬롯 트래커 초기화
@@ -521,6 +521,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 </body>
 </html>
+
 
 
 
