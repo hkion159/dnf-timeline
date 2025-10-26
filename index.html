@@ -621,6 +621,8 @@ function filterTimeline() {
     if (document.getElementById('filterTaecho')?.checked) checkedRarities.push('태초');
     if (document.getElementById('filterEpic')?.checked) checkedRarities.push('에픽');
     if (document.getElementById('filterLegendary')?.checked) checkedRarities.push('레전더리');
+
+    console.log('filterTimeline', checkedRarities);
     
     // 체크된 등급이 없으면 모든 데이터를 노출하지 않습니다.
     if (checkedRarities.length === 0) {
@@ -646,6 +648,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
