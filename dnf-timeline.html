@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>던파 아이템 유효성 검사기</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: #1a1a1a;
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #characterNameInput {
+            flex-grow: 1;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        #searchButton {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #searchButton:hover {
+            background-color: #0056b3;
+        }
+        #searchButton:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #status {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1em;
+            color: #555;
+            font-weight: bold;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .results-table th, .results-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+        .results-table th {
+            background-color: #f9f9f9;
+        }
+        .valid-true {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .valid-false {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>아이템 획득 유효성 검사기</h1>
+        <div class="input-area">
+            <input type="text" id="characterNameInput" placeholder="캐릭터명을 입력하세요 (서버: 카인)">
+            <button id="searchButton">조회</button>
+        </div>
+        <div id="status"></div>
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>획득 시간</th>
+                    <th>아이템명</th>
+                    <th>등급</th>
+                    <th>세트</th>
+                    <th>부위</th>
+                    <th>유효 여부</th>
+                </tr>
+            </thead>
+            <tbody id="resultsContainer">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        // --- 설정 및 상수 ---
+
+        const API_KEY = "ZyFEefejKEugYnK8kL5EBT5a81YqeAbz"; // 제공된 API 키
+        const SERVER_ID = "cain";
+        
+        // 아이템 등급 우선순위 (높을수록 좋음)
+        const RARITY_ORDER = {
+            "태초": 3,
+            "에픽": 2,
+            "레전더리": 1
+        };
+
+        // --- DOM 요소 ---
+        const charInput = document.getElementById('characterNameInput');
+        const searchBtn = document.getElementById('searchButton');
+        const statusEl = document.getElementById('status');
+        const resultsEl = document.getElementById('resultsContainer');
+
+        // --- API 호출 함수 ---
+
+        // 1. 캐릭터 ID 조회
+        async function getCharacterId(characterName) {
+            const url = `https://api.neople.co.kr/df/servers/${SERVER_ID}/characters?apikey=${API_KEY}&characterName=${encodeURIComponent(characterName)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("캐릭터 ID 조회 실패");
+            const data = await response.json();
+            if (!data.rows || data.rows.length === 0) throw new Error("캐릭터를 찾을 수 없습니다.");
+            return data.rows[0].characterId;
+        }
+
+        // 2. 타임라인 조회 (월별로 반복 호출)
+        async function getAllTimelinePages(characterId) {
+            let allTimelineRows = [];
+            let currentMonthStart = new Date('2025-01-01');
+            const today = new Date();
+
+            while (currentMonthStart <= today) {
+                // 다음 달 1일 계산
+                let nextMonthStart = new Date(currentMonthStart.getFullYear(), currentMonthStart.getMonth() + 1, 1);
+                
+                // 날짜 포맷팅 (YYYYMMDD)
+                const startDateStr = formatDate(currentMonthStart);
+                const endDateStr = formatDate(nextMonthStart);
+
+                statusEl.textContent = `${currentMonthStart.getFullYear()}년 ${currentMonthStart.getMonth() + 1}월 타임라인 조회 중...`;
+                
+                const url = `https://api.neople.co.kr/df/servers/${SERVER_ID}/characters/${characterId}/timeline?apikey=${API_KEY}&limit=100&code=505,507,513&startDate=${startDateStr}&endDate=${endDateStr}`;
+                
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    if (data.timeline && data.timeline.rows) {
+                        allTimelineRows.push(...data.timeline.rows);
+                    }
+                } catch (e) {
+                    console.error(`${startDateStr} 타임라인 조회 실패:`, e);
+                    // 한두 달 실패해도 계속 진행
+                }
+
+                // 다음 달로 이동
+                currentMonthStart = nextMonthStart;
+            }
+            return allTimelineRows;
+        }
+
+        // 3. 아이템 상세 정보 조회 (캐시 사용)
+        const itemDetailCache = new Map();
+        async function getItemDetails(itemId) {
+            if (itemDetailCache.has(itemId)) {
+                return itemDetailCache.get(itemId);
+            }
+            
+            const url = `https://api.neople.co.kr/df/items/${itemId}?apikey=${API_KEY}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) return null; // 조회 실패 시 null 반환
+                const data = await response.json();
+                itemDetailCache.set(itemId, data); // 캐시에 저장
+                return data;
+            } catch (e) {
+                console.error(`아이템(${itemId}) 상세 조회 실패:`, e);
+                return null;
+            }
+        }
+
+        // --- 메인 로직 ---
+        searchBtn.addEventListener('click', async () => {
+            const characterName = charInput.value.trim();
+            if (!characterName) {
+                alert("캐릭터명을 입력해주세요.");
+                return;
+            }
+
+            // 초기화
+            searchBtn.disabled = true;
+            statusEl.textContent = "조회를 시작합니다...";
+            resultsEl.innerHTML = "";
+            itemDetailCache.clear(); // 아이템 캐시 초기화
+
+            try {
+                // 1. 캐릭터 ID 가져오기
+                statusEl.textContent = "캐릭터 ID 조회 중...";
+                const characterId = await getCharacterId(characterName);
+                
+                // 2. 모든 타임라인 데이터 가져오기 (월별)
+                const allTimelineRows = await getAllTimelinePages(characterId);
+                
+                if (allTimelineRows.length === 0) {
+                    statusEl.textContent = "조회 기간 내 아이템 획득 기록이 없습니다.";
+                    searchBtn.disabled = false;
+                    return;
+                }
+
+                // 3. 타임라인 처리 (오래된 순으로 정렬)
+                statusEl.textContent = "타임라인 처리 중... (아이템 상세 정보 조회)";
+                allTimelineRows.sort((a, b) => new Date(a.date) - new Date(b.date)); // 획득순(오름차순) 정렬
+
+                const processedItems = [];
+                const highestAcquiredRarity = {}; // Key: "세트명_부위명", Value: 등급 점수(3, 2, 1)
+
+                let processedCount = 0;
+                for (const itemDrop of allTimelineRows) {
+                    processedCount++;
+                    statusEl.textContent = `타임라인 처리 중... (${processedCount}/${allTimelineRows.length})`;
+                    
+                    const dropData = itemDrop.data;
+                    const itemId = dropData.itemId;
+                    const itemRarity = dropData.itemRarity;
+                    const dropDate = itemDrop.date;
+
+                    // 3-1. 아이템 상세 정보 조회
+                    const details = await getItemDetails(itemId);
+
+                    // 3-2. 유효성 검사: 115레벨이 아니거나, 세트 아이템이 아니면 무시
+                    if (!details || details.itemAvailableLevel !== 115 || !details.setItemName) {
+                        continue;
+                    }
+
+                    const setItemName = details.setItemName;
+                    const itemTypeDetail = details.itemTypeDetail;
+                    
+                    // 3-3. 유효성 로직 실행
+                    const itemKey = `${setItemName}_${itemTypeDetail}`;
+                    const currentRarityScore = RARITY_ORDER[itemRarity] || 0;
+                    const highestRarityScore = highestAcquiredRarity[itemKey] || 0;
+
+                    let isValid = false;
+                    
+                    // 현재 획득한 아이템 등급이 이전에 획득한 최고 등급보다 높아야 유효
+                    if (currentRarityScore > highestRarityScore) {
+                        isValid = true;
+                        highestAcquiredRarity[itemKey] = currentRarityScore; // 최고 등급 갱신
+                    }
+
+                    processedItems.push({
+                        date: dropDate,
+                        itemName: dropData.itemName,
+                        rarity: itemRarity,
+                        setName: setItemName,
+                        slot: itemTypeDetail,
+                        isValid: isValid
+                    });
+                }
+
+                // 4. 결과 출력
+                displayResults(processedItems);
+
+            } catch (error) {
+                console.error(error);
+                statusEl.textContent = `오류 발생: ${error.message}`;
+            } finally {
+                searchBtn.disabled = false;
+                if (!statusEl.textContent.startsWith("오류")) {
+                    statusEl.textContent = "조회 완료!";
+                }
+            }
+        });
+
+        // --- 유틸리티 함수 ---
+
+        // 결과 테이블에 표시
+        function displayResults(items) {
+            // 최신순(내림차순)으로 정렬하여 표시
+            items.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (items.length === 0) {
+                resultsEl.innerHTML = '<tr><td colspan="6">표시할 115레벨 세트 아이템이 없습니다.</td></tr>';
+                return;
+            }
+
+            let html = "";
+            for (const item of items) {
+                const validityClass = item.isValid ? 'valid-true' : 'valid-false';
+                const validityText = item.isValid ? '유효' : '무효';
+                
+                html += `
+                    <tr>
+                        <td>${item.date}</td>
+                        <td>${item.itemName}</td>
+                        <td>${item.rarity}</td>
+                        <td>${item.setName}</td>
+                        <td>${item.slot}</td>
+                        <td class="${validityClass}">${validityText}</td>
+                    </tr>
+                `;
+            }
+            resultsEl.innerHTML = html;
+        }
+
+        // 날짜를 'YYYYMMDD' 형식의 문자열로 변환
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}${month}${day}`;
+        }
+    </script>
+
+</body>
+</html>
