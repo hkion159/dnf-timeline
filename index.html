@@ -653,10 +653,9 @@ async function getTimelineItemDetails(allItemIds) {
             resultsEl.innerHTML = html;
 
             const rowCountElement = document.getElementById('totalRowCount'); // 🚨 새로운 요소 가져오기 🚨
-            let totalRows = 0; // 🚨 총 행 수 카운터 초기화 🚨
             // 3. 총 행 수 업데이트
     if (rowCountElement) {
-        rowCountElement.textContent = `총 행 수: ${items.size}`;
+        rowCountElement.textContent = `총 행 수: ${items.length}`;
     }
             
         }
@@ -722,6 +721,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
