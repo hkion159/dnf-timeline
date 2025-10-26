@@ -446,7 +446,7 @@ async function getTimelineItemDetails(allItemIds) {
                                 if (setSlotTracker[setItemName][r]) {
                                     setSlotTracker[setItemName][r].forEach(slot => {
                                         // 🚨 태초 등급 아이템일 경우, 슬롯을 3개로 제한 🚨
-                        if (itemRarity === '태초' && !TAECHO_SLOTS.includes(itemTypeDetail)) {
+                        if (itemRarity === '태초' && !TAECHO_SLOTS.includes(slot)) {
                             return; // 태초가 아닌 부위는 카운트하지 않음
                         }
                                         countedSlots.add(itemTypeDetail);
@@ -464,8 +464,12 @@ async function getTimelineItemDetails(allItemIds) {
                         // 5. 확률 계산
                         if (filledSlotCount < TOTAL_SET_SLOTS) {
                             // 남은 유효 부위 개수: 11 - 현재 획득한 부위 개수
-                            const remainingValidSlots = TOTAL_SET_SLOTS - filledSlotCount;
-                            const probability = (remainingValidSlots / TOTAL_SET_SLOTS) * 100;
+                            let remainingValidSlots = TOTAL_SET_SLOTS - filledSlotCount;
+                            let probability = (remainingValidSlots / TOTAL_SET_SLOTS) * 100;
+                            if (itemRarity === '태초') {
+                                remainingValidSlots = MAX_TAECHO_SLOTS - filledSlotCount;
+                                probability = (remainingValidSlots / MAX_TAECHO_SLOTS) * 100;
+                            }
 
                             // 소수점 첫째 자리에서 반올림
                             const roundedProbability = Math.round(probability); 
@@ -572,6 +576,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 </body>
 </html>
+
 
 
 
