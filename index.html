@@ -118,6 +118,30 @@
     background-color: #8cd98c; /* 진한 녹색 */
     color: #003300;
 }
+
+        /* 유효 확률은 낮았는데 성공한 경우 (운이 좋음 - 녹색 강조) */
+.result-success-low-prob {
+    font-weight: bold;
+    background-color: #d4edda; /* 밝은 초록색 배경 */
+    color: #155724; /* 짙은 초록색 텍스트 */
+    border: 1px solid #c3e6cb;
+}
+
+        /* 유효 확률은 높았는데 실패한 경우 (운이 나쁨 - 빨간색 강조) */
+.result-fail-high-prob {
+    font-weight: bold;
+    background-color: #f8d7da; /* 밝은 빨간색 배경 */
+    color: #721c24; /* 짙은 빨간색 텍스트 */
+    border: 1px solid #f5c6cb;
+}
+
+/* 일반적인 성공/실패 표시 (경고가 필요 없는 경우) */
+.result-normal {
+    font-weight: normal;
+    background-color: transparent;
+    color: inherit;
+}
+        
     </style>
 </head>
 <body>
@@ -162,6 +186,7 @@
                     <th>부위</th>
                     <th>유효 확률</th>
                     <th>유효 여부</th>
+                    <th>운</th>
                 </tr>
             </thead>
             <tbody id="resultsContainer">
@@ -469,6 +494,8 @@ async function getTimelineItemDetails(allItemIds) {
                 
                     let probabilityContent = '';
                     let styleClass = ''; // 새로 추가된 스타일 변수
+                let resultClass = 'result-normal';
+                    let roundedProbability = 0;
                     
                     // 2. 슬롯 추적기 구조: setSlotTracker[setName] = Map<Rarity, Set<SlotName>>
                         if (!setSlotTracker[setItemName]) {
@@ -516,7 +543,7 @@ async function getTimelineItemDetails(allItemIds) {
                             }
 
                             // 소수점 첫째 자리에서 반올림
-                            const roundedProbability = Math.round(probability); 
+                             roundedProbability = Math.round(probability); 
                             probabilityContent = `${roundedProbability}%`;
 
                             // 🚨 확률 구간에 따른 스타일 클래스 결정 🚨
@@ -549,6 +576,14 @@ async function getTimelineItemDetails(allItemIds) {
                         isValid = true;
                         highestAcquiredRarity[itemKey] = currentRarityScore; // 최고 등급 갱신
                     }
+                    
+                            if (roundedProbability <= 20 && isValid) {
+                                resultClass = 'result-success-low-prob';
+                                resultText = '운도실력';
+                            } else if (roundedProbability >= 80 && !isValid) {
+                                resultClass = 'result-fail-high-prob';
+                                resultText = '나만운없어';
+                            }   
 
                     processedItems.push({
                         date: dropDate,
@@ -559,7 +594,9 @@ async function getTimelineItemDetails(allItemIds) {
                         isValid: isValid,
                         probabilityContent: probabilityContent,
                         styleClass: styleClass,
-                        style: itemStyle
+                        style: itemStyle,
+                        resultClass: resultClass,
+                        resultText: resultText
                     });
                 }
 
@@ -608,6 +645,7 @@ async function getTimelineItemDetails(allItemIds) {
                         <td>${item.slot}</td>
                         <td class="probability-cell ${item.styleClass}">${item.probabilityContent}</td>
                         <td class="${validityClass}">${validityText}</td>
+                        <td class="${item.resultClass}">${item.resultText}</td>
                     </tr>
                 `;
             }
@@ -683,6 +721,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
