@@ -606,7 +606,10 @@ async function getTimelineItemDetails(allItemIds) {
                             } else if (roundedProbability >= 80 && !isValid) {
                                 resultClass = 'result-fail-high-prob';
                                 resultText = '나만운없어';
-                            }   
+                            }   else if (itemRarity === '태초' && !isValid) {
+                                resultClass = 'result-fail-high-prob';
+                                resultText = '태초중복☠';
+                            }
 
                     let setClass = '';
                     if (set === setItemName) {
@@ -748,6 +751,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
