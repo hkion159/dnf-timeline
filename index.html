@@ -125,7 +125,7 @@
         <h1>아이템 획득 유효성 검사기</h1>
         <div class="input-area">
             <input type="text" id="characterNameInput" placeholder="캐릭터명을 입력하세요 (서버: 카인)">
-            <button id="searchButton">조회</button>
+            <button id="searchButton" onclick="startSearch()">조회</button>
         </div>
         <div id="status"></div>
         <table class="results-table">
@@ -191,6 +191,18 @@ const PROXY_BASE_URL = "/api/proxy/df"; // Neople API의 /df 이전 경로를 �
         const searchBtn = document.getElementById('searchButton');
         const statusEl = document.getElementById('status');
         const resultsEl = document.getElementById('resultsContainer');
+
+        /**
+ * 캐릭터명 입력창에서 Enter 키를 눌렀을 때 startSearch() 함수를 호출합니다.
+ * @param {Event} event - 키보드 이벤트 객체
+ */
+function handleEnterKey(event) {
+    // Enter 키의 keyCode는 13입니다.
+    if (event.key === 'Enter' || event.keyCode === 13) {
+        event.preventDefault(); // 기본 Enter 동작(폼 제출 등) 방지
+        startSearch();         // 조회 시작 함수 호출
+    }
+}
 
         // --- API 호출 함수 ---
 
@@ -342,7 +354,7 @@ async function getTimelineItemDetails(allItemIds) {
         }
 
         // --- 메인 로직 ---
-        searchBtn.addEventListener('click', async () => {
+         async function startSearch() {
             const characterName = charInput.value.trim();
             if (!characterName) {
                 alert("캐릭터명을 입력해주세요.");
@@ -531,7 +543,7 @@ async function getTimelineItemDetails(allItemIds) {
                     statusEl.textContent = "조회 완료!";
                 }
             }
-        });
+        }
 
         // --- 유틸리티 함수 ---
 
@@ -572,10 +584,22 @@ async function getTimelineItemDetails(allItemIds) {
             const day = date.getDate().toString().padStart(2, '0');
             return `${year}${month}${day}`;
         }
+
+        // ------------------------------------------------------------------
+// 🚨 DOM 로드 후 이벤트 리스너 연결 🚨
+document.addEventListener('DOMContentLoaded', (event) => {
+    const inputElement = document.getElementById('characterNameInput');
+    
+    // input 요소가 존재하는지 확인 후 이벤트 리스너 연결
+    if (inputElement) {
+        inputElement.addEventListener('keydown', handleEnterKey);
+    }
+});
     </script>
 
 </body>
 </html>
+
 
 
 
