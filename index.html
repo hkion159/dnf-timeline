@@ -30,6 +30,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            max-width: 100px;
         }
         #characterNameInput {
             flex-grow: 1;
@@ -127,6 +128,19 @@
             <input type="text" id="characterNameInput" placeholder="캐릭터명을 입력하세요 (서버: 카인)">
             <button id="searchButton" onclick="startSearch()">조회</button>
         </div>
+        
+        <div id="rarityFilters" style="margin-top: 15px;">
+    <label>
+        <input type="checkbox" id="filterTaecho" value="태초" onchange="filterTimeline()"> 태초
+    </label>
+    <label>
+        <input type="checkbox" id="filterEpic" value="에픽" onchange="filterTimeline()"> 에픽
+    </label>
+    <label>
+        <input type="checkbox" id="filterLegendary" value="레전더리" onchange="filterTimeline()"> 레전더리
+    </label>
+    </div>
+        
         <div id="status"></div>
         <table class="results-table">
             <thead>
@@ -146,6 +160,10 @@
     </div>
 
     <script>
+// 🚨 모든 타임라인 데이터를 저장할 전역 변수 🚨
+let allTimelinePages = [];
+let filteredTimelinePages = [];
+        
         // 전역 캐시 객체: 아이템 ID를 키(Key)로, 아이템 상세 정보를 값(Value)으로 저장
         const itemDetailsCache = {};
         
@@ -531,8 +549,12 @@ async function getTimelineItemDetails(allItemIds) {
                     });
                 }
 
+
+                // 🚨 전역 변수에 전체 데이터 저장 🚨
+            allTimelinePages = processedItems;
+                filterTimeline();
                 // 4. 결과 출력
-                displayResults(processedItems);
+                displayResults();
 
             } catch (error) {
                 console.error(error);
@@ -548,7 +570,8 @@ async function getTimelineItemDetails(allItemIds) {
         // --- 유틸리티 함수 ---
 
         // 결과 테이블에 표시
-        function displayResults(items) {
+        function displayResults() {
+            const items = filteredTimelinePages;
             // 최신순(내림차순)으로 정렬하여 표시
             items.sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -585,6 +608,33 @@ async function getTimelineItemDetails(allItemIds) {
             return `${year}${month}${day}`;
         }
 
+        /**
+ * 체크박스 상태에 따라 타임라인 데이터를 필터링하고 노출합니다.
+ */
+function filterTimeline() {
+    const tableBody = document.querySelector('#resultsContainer tbody');
+    if (!allTimelinePages || allTimelinePages.length === 0 || !tableBody) {
+        return; // 데이터가 없거나 테이블이 준비되지 않았으면 종료
+    }
+    
+    // 1. 체크된 등급(Rarities) 확인
+    const checkedRarities = [];
+    if (document.getElementById('filterTaecho')?.checked) checkedRarities.push('태초');
+    if (document.getElementById('filterEpic')?.checked) checkedRarities.push('에픽');
+    if (document.getElementById('filterLegendary')?.checked) checkedRarities.push('레전더리');
+    
+    // 체크된 등급이 없으면 모든 데이터를 노출하지 않습니다.
+    if (checkedRarities.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">선택된 아이템 등급이 없습니다.</td></tr>';
+        return;
+    }
+
+    const filteredPages = [];
+
+    // 2. 전체 데이터를 순회하며 필터링
+    filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity));
+}
+
         // ------------------------------------------------------------------
 // 🚨 DOM 로드 후 이벤트 리스너 연결 🚨
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -599,6 +649,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
