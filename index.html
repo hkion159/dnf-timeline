@@ -167,6 +167,10 @@ const RARITY_RANK = {
 const TOTAL_SET_SLOTS = 11; 
 // 유효 희귀도 목록
 const VALID_RARITIES = ['태초', '에픽', '레전더리'];
+
+        // 🚨 태초 아이템의 실제 세트 부위 (액세서리 3종) 🚨
+const TAECHO_SLOTS = ['팔찌', '목걸이', '반지'];
+const MAX_TAECHO_SLOTS = TAECHO_SLOTS.length; // 3
         
         // --- 설정 및 상수 ---
 // *** 프록시 서버의 기본 경로를 정의합니다. ***
@@ -441,12 +445,21 @@ async function getTimelineItemDetails(allItemIds) {
                             if (RARITY_RANK[r] <= targetRank) {
                                 if (setSlotTracker[setItemName][r]) {
                                     setSlotTracker[setItemName][r].forEach(slot => {
-                                        countedSlots.add(slot);
+                                        // 🚨 태초 등급 아이템일 경우, 슬롯을 3개로 제한 🚨
+                        if (itemRarity === '태초' && !TAECHO_SLOTS.includes(itemTypeDetail)) {
+                            return; // 태초가 아닌 부위는 카운트하지 않음
+                        }
+                                        countedSlots.add(itemTypeDetail);
                                     });
                                 }
                             }
                         }
-                        filledSlotCount = countedSlots.size;
+                        // 5. 태초 아이템의 경우, 카운팅 된 부위 중 최대 3개만 유효 부위로 간주
+        if (itemRarity === '태초') {
+            filledSlotCount = Math.min(countedSlots.size, MAX_TAECHO_SLOTS);
+        } else {
+            filledSlotCount = countedSlots.size;
+        }
                     
                         // 5. 확률 계산
                         if (filledSlotCount < TOTAL_SET_SLOTS) {
@@ -475,7 +488,13 @@ async function getTimelineItemDetails(allItemIds) {
                         }
                         
                         // 6. 슬롯 트래커 업데이트 (확률 계산 후, 현재 아이템 부위를 추가)
+                    // 7. 슬롯 트래커 업데이트
+        // 🚨 태초일 경우, 트래커에 추가할 때도 3개 부위만 추가하도록 제약 🚨
+        if (itemRarity === '태초' && !TAECHO_SLOTS.includes(itemTypeDetail)) {
+             // 태초 아이템이 아닌 부위 (예: 무기)로 잘못 들어왔다면 트래커에 추가하지 않음
+        } else {
                         setSlotTracker[setItemName][itemRarity].add(itemTypeDetail);
+        }
                     
                     // 현재 획득한 아이템 등급이 이전에 획득한 최고 등급보다 높아야 유효
                     if (currentRarityScore > highestRarityScore) {
@@ -553,6 +572,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 </body>
 </html>
+
 
 
 
