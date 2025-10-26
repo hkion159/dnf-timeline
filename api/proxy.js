@@ -30,7 +30,7 @@ export default async function handler(request, response) {
     
     // Vercel URL 구조: /api/proxy/<Neople API URL 경로>
     // 네오플 API URL 경로를 추출합니다.
-    const pathSegments = pathname.split('/').slice(3); // /api/proxy/ 이후의 경로
+    const pathSegments = pathname.split('/').slice(4); // /api/proxy/ 이후의 경로
     const neoplePath = pathSegments.join('/');
 
     // 3. Neople API의 기본 URL을 만듭니다.
