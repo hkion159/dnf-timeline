@@ -172,7 +172,7 @@
 
         <p id="totalRowCount" style="font-weight: bold; margin: 10px 0;">총 타임라인 수: 0</p>
 
-        <div id="infoNotice" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; color: #333; border-radius: 4px;">
+        <div id="infoNotice" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; background: url('https://img-api.neople.co.kr/df/servers/cain/characters/4ecd3f9eea4b6dd87044a9d9323efd20?zoom=1') no-repeat center; color: #333; border-radius: 4px;">
     <strong>✅ 유효 확률 계산 안내</strong>
     <p style="margin-top: 5px; margin-bottom: 0; font-size: 0.95em;">
         <ul>
@@ -444,6 +444,8 @@ async function getTimelineItemDetails(allItemIds) {
                 // 1. 캐릭터 ID 가져오기
                 statusEl.textContent = "캐릭터 ID 조회 중...";
                 const characterId = await getCharacterId(characterName);
+                const el = document.getElementById('infoNotice');
+                el.style.background = `url('https://img-api.neople.co.kr/df/servers/cain/characters/${characterId}?zoom=1') no-repeat center`
 
                 resetGlobalData();
                 
@@ -754,6 +756,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
