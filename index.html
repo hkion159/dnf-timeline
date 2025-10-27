@@ -667,11 +667,11 @@ async function getTimelineItemDetails(allItemIds) {
                             });
                             
                             // 마지막 아이템에 결과 추가
-                            if (chanceSum <= 30*seqLength && seqLength >= 3) {
-                                if (last.isValid) {
+                            if (seqLength >= 3) {
+                                if (chanceSum <= 30*seqLength && last.isValid) {
                                 processedItems[processedItems.length-1].resultClass = 'result-success-low-prob';
                                 processedItems[processedItems.length-1].resultText = '💯'.repeat(seqLength);
-                                } else {
+                                } else if (chanceSum >= 70*seqLength && !last.isValid) {
                                 processedItems[processedItems.length-1].resultClass = 'result-fail-high-prob';
                                 processedItems[processedItems.length-1].resultText = '☠'.repeat(seqLength);
                                 }
@@ -858,6 +858,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
