@@ -154,7 +154,10 @@
     <div class="container">
         <h1>던파 득템 유효성 검사기</h1>
         <div class="input-area">
-            <input type="text" id="characterNameInput" placeholder="캐릭터명을 입력하세요 (서버: 카인)">
+            <select id="serverSelect" onchange="saveSelectedServerId(this.value)">
+        <option value="cain" disabled selected>서버를 선택하세요</option>
+    </select>
+            <input type="text" id="characterNameInput" placeholder="캐릭터명을 입력하세요">
             <button id="searchButton" onclick="startSearch()">조회</button>
         </div>
         
@@ -205,6 +208,19 @@
     </div>
 
     <script>
+
+        // 제공된 서버 데이터
+        const serverData = [
+            { "serverId" : "cain", "serverName" : "카인" },
+            { "serverId" : "diregie", "serverName" : "디레지에" },
+            { "serverId" : "siroco", "serverName" : "시로코" },
+            { "serverId" : "prey", "serverName" : "프레이" },
+            { "serverId" : "casillas", "serverName" : "카시야스" },
+            { "serverId" : "hilder", "serverName" : "힐더" },
+            { "serverId" : "anton", "serverName" : "안톤" },
+            { "serverId" : "bakal", "serverName" : "바칼" }
+        ];
+        
 // 🚨 모든 타임라인 데이터를 저장할 전역 변수 🚨
 let allTimelinePages = [];
 let filteredTimelinePages = [];
@@ -240,7 +256,7 @@ const MAX_TAECHO_SLOTS = TAECHO_SLOTS.length; // 3
 // Vercel에 배포된 경우, /api/proxy는 api/proxy.js 서버리스 함수로 연결됩니다.
 const PROXY_BASE_URL = "/api/proxy/df"; // Neople API의 /df 이전 경로를 프록시로 지정
         
-        const SERVER_ID = "cain";
+        let SERVER_ID = "cain";
         
         // 아이템 등급 우선순위 (높을수록 좋음)
         const RARITY_ORDER = {
@@ -453,7 +469,7 @@ async function getTimelineItemDetails(allItemIds) {
                 statusEl.textContent = "캐릭터 ID 조회 중...";
                 const characterId = await getCharacterId(characterName);
                 const el = document.getElementById('infoNotice');
-                el.style.background = `url('https://img-api.neople.co.kr/df/servers/cain/characters/${characterId}?zoom=1') no-repeat center`
+                el.style.background = `url('https://img-api.neople.co.kr/df/servers/${SERVER_ID}/characters/${characterId}?zoom=1') no-repeat center`
 
                 resetGlobalData();
                 
@@ -762,10 +778,38 @@ document.addEventListener('DOMContentLoaded', (event) => {
         inputElement.addEventListener('keydown', handleEnterKey);
     }
 });
+
+        // 1. 드롭다운 옵션을 생성하고 추가하는 함수
+        function populateServerOptions() {
+            const selectElement = document.getElementById('serverSelect');
+
+            serverData.forEach(server => {
+                const option = document.createElement('option');
+                option.value = server.serverId; // option의 value에 serverId 저장
+                option.textContent = server.serverName; // 사용자에게 보이는 텍스트
+                selectElement.appendChild(option);
+            });
+        }
+
+        // 2. 선택된 값을 전역 변수에 저장하고 화면에 표시하는 함수
+        function saveSelectedServerId(serverId) {
+            // 전역 변수에 값 저장
+            SERVER_ID = serverId; 
+            
+            // 값이 저장되었는지 확인용 (선택 사항)
+            console.log("선택된 서버 ID:", selectedServerId);
+
+            // 화면에 표시
+            document.getElementById('displaySelectedId').textContent = selectedServerId;
+        }
+
+        // 페이지 로드 시 옵션 생성 함수 실행
+        document.addEventListener('DOMContentLoaded', populateServerOptions);
     </script>
 
 </body>
 </html>
+
 
 
 
