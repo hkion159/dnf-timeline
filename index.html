@@ -660,8 +660,7 @@ async function getTimelineItemDetails(allItemIds) {
                         const last = chanceSeqTimeline[seqLength-1];
                         
                         if (isValid !== last.isValid) {
-                            const chanceSum = chanceSeqTimeline.reduce((acc,cur)=>acc+cur.probability,0);
-
+                            const tempSeqTimeline = chanceSeqTimeline;
                             
                             // 연속 정보 초기화
                             chanceSeqTimeline = [];
@@ -672,13 +671,22 @@ async function getTimelineItemDetails(allItemIds) {
                             
                             // 마지막 아이템에 결과 추가
                             if (seqLength >= 3) {
-                                if (chanceSum <= 33*seqLength && last.isValid) {
+                                let validSeqLength = 0;
+                                for (let i = seqLength; i >=3; i--){
+                                    const slicedList = tempSeqTimeline.slice(-i);
+                                    const slicedSeqLength = slicedList.length;
+                            const chanceSum = slicedList.reduce((acc,cur)=>acc+cur.probability,0);
+                                    if (chanceSum <= 33*slicedSeqLength && last.isValid) {
                                 processedItems[processedItems.length-1].resultClass = 'result-success-low-prob';
-                                processedItems[processedItems.length-1].resultText = '💯'.repeat(seqLength);
-                                } else if (chanceSum >= 66*seqLength && !last.isValid) {
+                                processedItems[processedItems.length-1].resultText = '💯'.repeat(slicedSeqLength);
+                                        break;
+                                } else if (chanceSum >= 66*slicedSeqLength && !last.isValid) {
                                 processedItems[processedItems.length-1].resultClass = 'result-fail-high-prob';
-                                processedItems[processedItems.length-1].resultText = '☠'.repeat(seqLength);
+                                processedItems[processedItems.length-1].resultText = '☠'.repeat(slicedSeqLength);
+                                        break;
                                 }
+                                }
+                                
                             }
 
 
@@ -862,6 +870,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
