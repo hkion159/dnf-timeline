@@ -671,6 +671,7 @@ async function getTimelineItemDetails(allItemIds) {
                             
                             // 마지막 아이템에 결과 추가
                             if (seqLength >= 3) {
+                                console.log(`seqLength = ${seqLength}`,tempSeqTimeline);
                                 let validSeqLength = 0;
                                 for (let i = seqLength; i >=3; i--){
                                     const slicedList = tempSeqTimeline.slice(-i);
@@ -870,6 +871,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
