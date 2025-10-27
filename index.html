@@ -781,8 +781,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         // 1. 드롭다운 옵션을 생성하고 추가하는 함수
         function populateServerOptions() {
             const selectElement = document.getElementById('serverSelect');
-
-            selectElement.innerHTML = '';
             
             // 첫 번째 항목(index === 0)을 기본 선택값으로 지정
                 if (index === 0) {
@@ -815,6 +813,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
