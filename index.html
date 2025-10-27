@@ -251,6 +251,8 @@ const VALID_RARITIES = ['태초', '에픽', '레전더리'];
         // 🚨 태초 아이템의 실제 세트 부위 (액세서리 3종) 🚨
 const TAECHO_SLOTS = ['팔찌', '목걸이', '반지'];
 const MAX_TAECHO_SLOTS = TAECHO_SLOTS.length; // 3
+
+        const VALID_SLOTS = ['상의','머리어깨','하의','벨트','신발','팔찌','목걸이','반지','보조장비','마법석','귀걸이'];
         
         // --- 설정 및 상수 ---
 // *** 프록시 서버의 기본 경로를 정의합니다. ***
@@ -517,6 +519,8 @@ async function getTimelineItemDetails(allItemIds) {
 
                     const setItemName = details.setItemName;
                     const itemTypeDetail = details.itemTypeDetail;
+
+                    if (!VALID_SLOTS.includes(itemTypeDetail)) continue;
                     
                     // 3-3. 유효성 로직 실행
                     const itemKey = `${setItemName}_${itemTypeDetail}`;
@@ -685,9 +689,6 @@ async function getTimelineItemDetails(allItemIds) {
                             });
                         }
                     }
-
-                    if (setItemName === '에테리얼 오브 아츠 세트') {
-                        console.log(itemTypeDetail,dropData.itemName,countedSlots);}
 
                     
                     processedItems.push({
@@ -861,6 +862,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
