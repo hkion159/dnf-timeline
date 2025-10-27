@@ -155,6 +155,7 @@
         <h1>던파 득템 유효성 검사기</h1>
         <div class="input-area">
             <select id="serverSelect" onchange="saveSelectedServerId(this.value)">
+<option value="" disabled selected>서버를 선택하세요</option>
     </select>
             <input type="text" id="characterNameInput" placeholder="캐릭터명을 입력하세요">
             <button id="searchButton" onclick="startSearch()">조회</button>
@@ -813,6 +814,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
