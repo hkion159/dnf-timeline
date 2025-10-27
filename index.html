@@ -664,10 +664,6 @@ async function getTimelineItemDetails(allItemIds) {
                             
                             // 연속 정보 초기화
                             chanceSeqTimeline = [];
-                            chanceSeqTimeline.push({
-                        isValid: isValid,
-                                probability: roundedProbability
-                            });
                             
                             // 마지막 아이템에 결과 추가
                             if (seqLength >= 3) {
@@ -691,13 +687,14 @@ async function getTimelineItemDetails(allItemIds) {
                             }
 
 
-                        } else {
+                        } 
+                    } 
                             chanceSeqTimeline.push({
                         isValid: isValid,
                                 probability: roundedProbability
                             });
-                        }
-                    }
+                    
+                        
 
                     
                     processedItems.push({
@@ -871,6 +868,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
