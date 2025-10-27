@@ -223,6 +223,8 @@
 // 🚨 모든 타임라인 데이터를 저장할 전역 변수 🚨
 let allTimelinePages = [];
 let filteredTimelinePages = [];
+
+        let chanceSeqTimeline = [];
         
         // 전역 캐시 객체: 아이템 ID를 키(Key)로, 아이템 상세 정보를 값(Value)으로 저장
         const itemDetailsCache = {};
@@ -646,6 +648,45 @@ async function getTimelineItemDetails(allItemIds) {
                     if (set === setItemName) {
                         setClass = 'highlight-set';
                 }
+
+
+                    // 아이템 연속 운 설정
+                    if (chanceSeqTimeline?.length > 0) {
+                            const seqLength = chanceSeqTimeline.length;
+                        const last = chanceSeqTimeline[seqLength-1];
+                        
+                        if (isValid !== last.isValid) {
+                            const chanceSum = chanceSeqTimeline.reduce((acc,cur)=>acc+cur.probability,0);
+
+                            
+                            // 연속 정보 초기화
+                            chanceSeqTimeline = [];
+                            chanceSeqTimeline.push({
+                        isValid: isValid,
+                                probability: roundedProbability
+                            });
+                            
+                            // 마지막 아이템에 결과 추가
+                            if (chanceSum <= 30*seqLength && seqLength >= 3) {
+                                if (last.isValid) {
+                                processedItems[processedItems.length-1].resultClass = 'result-success-low-prob';
+                                processedItems[processedItems.length-1].resultText = '💯'.repeat(seqLength);
+                                } else {
+                                processedItems[processedItems.length-1].resultClass = 'result-fail-high-prob';
+                                processedItems[processedItems.length-1].resultText = '☠'.repeat(seqLength);
+                                }
+                            }
+
+
+                        } else {
+                            chanceSeqTimeline.push({
+                        isValid: isValid,
+                                probability: roundedProbability
+                            });
+                        }
+                    }
+
+                    
                     processedItems.push({
                         date: dropDate,
                         itemName: dropData.itemName,
@@ -817,6 +858,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 </body>
 </html>
+
 
 
 
