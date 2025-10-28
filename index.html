@@ -977,7 +977,7 @@
                         });
                     }
 
-                    if (Date(dropDate).getMonth() !== Date(processedItems[processedItems.length - 1]).getMonth()) {
+                    if (new Date(dropDate).getMonth() !== new Date(processedItems[processedItems.length - 1]).getMonth()) {
                         setClass += 'group-divider';
                     }
 
