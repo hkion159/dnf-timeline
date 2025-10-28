@@ -254,21 +254,8 @@
         <h1>던파 득템 유효성 검사기</h1>
         <div id="search-history-container" class="search-history-container">
             <div class="nickname-tag">
-                <span class="server-name">길드워2</span>
-                <span class="nickname-text">캐릭터닉네임A</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="server-name">WOW</span>
-                <span class="nickname-text">닉네임B</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ</span>
+                <span class="server-name"> </span>
+                <span class="nickname-text"> </span>
                 <button class="remove-btn">x</button>
             </div>
         </div>
@@ -1065,8 +1052,8 @@
                 db = event.target.result; // 전역 변수에 DB 객체 저장
                 console.log('IndexedDB 연결 성공.');
 
-                // 연결 후 데이터 작업을 시작합니다.
-                // addDataAndRead();
+                // ★★★ 연결 성공 후 데이터 로드 시작 ★★★
+                loadAndDisplayTags();
             };
 
             // DB 연결 실패 시 실행됨
@@ -1076,64 +1063,122 @@
         }
 
         /**
-         * 2. 데이터 추가 및 읽기 (트랜잭션 사용)
-         */
-        function addDataAndRead() {
+        * DB에서 데이터를 조회하여 닉네임 태그를 생성하고 추가합니다.
+        */
+        async function loadAndDisplayTags() {
+            // 1. DB 연결 확인
             if (!db) {
-                console.error('DB가 연결되지 않았습니다.');
+                console.error("IndexedDB 연결이 완료되지 않았습니다.");
+                // 필요하다면 여기서 openDatabase()를 다시 호출하여 연결을 시도할 수 있습니다.
                 return;
             }
 
-            // 'readwrite' 모드로 트랜잭션 시작
-            const transaction = db.transaction([STORE_NAME], 'readwrite');
-            const store = transaction.objectStore(STORE_NAME);
+            const container = document.querySelector('.search-history-container');
+            if (!container) return;
 
-            // 1. 데이터 추가 작업
-            const item1 = { name: '노트북', price: 1500000 };
-            const item2 = { name: '키보드', price: 80000 };
+            // 기존 내용을 비웁니다.
+            container.innerHTML = '';
 
-            store.add(item1);
-            store.add(item2);
+            try {
+                // 2. Promise 기반의 getCharacters 함수를 사용하여 모든 캐릭터 데이터 조회
+                // (getCharacters 함수가 Promise를 반환하므로 await 사용 가능)
+                const characterList = await getCharacters();
 
-            transaction.oncomplete = () => {
-                console.log('데이터 추가 트랜잭션 완료.');
-                // 2. 추가된 데이터 읽기 작업을 시작합니다.
-                readAllData();
-            };
+                // 3. 조회된 데이터를 순회하며 태그 생성
+                characterList.forEach(charactersObject => {
+                    Object.entries((serverName, nickname) => {
+                        const tag = createNicknameTag(serverName, nickname);
+                        container.appendChild(tag);
+                    });
+                });
 
-            transaction.onerror = (event) => {
-                console.error('데이터 추가 트랜잭션 오류:', event.target.error);
-            };
+            } catch (error) {
+                console.error("데이터 조회 및 태그 생성 중 오류 발생:", error);
+                container.innerHTML = '<li>검색 기록을 불러오는 데 실패했습니다.</li>';
+            }
         }
 
+        function getCharacters() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([CHARACTER_STORE], 'readonly');
+                const store = transaction.objectStore(CHARACTER_STORE);
+
+                // 커서를 사용하여 모든 데이터를 조회합니다.
+                const request = store.openCursor();
+                let results = [];
+
+                request.onsuccess = (event) => {
+                    const cursor = event.target.result;
+                    if (cursor) {
+                        results.push(cursor.value);
+                        cursor.continue();
+                    } else {
+                        resolve(results); // 모든 데이터 배열을 resolve
+                    }
+                };
+
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+
+
         /**
-         * 3. 모든 데이터 읽기 (커서 사용)
+         * 개별 닉네임 태그 (HTML 요소)를 생성합니다.
          */
-        function readAllData() {
-            const transaction = db.transaction([STORE_NAME], 'readonly');
-            const store = transaction.objectStore(STORE_NAME);
+        function createNicknameTag(serverName, nickname) {
+            const tagDiv = document.createElement('div');
+            tagDiv.className = 'nickname-tag';
 
-            // 모든 데이터를 순회하기 위한 커서 요청
-            const request = store.openCursor();
+            // 서버 이름 요소
+            const serverSpan = document.createElement('span');
+            serverSpan.className = 'server-name';
+            serverSpan.textContent = serverName;
 
-            let dataList = [];
+            // 닉네임 요소
+            const nicknameSpan = document.createElement('span');
+            nicknameSpan.className = 'nickname-text';
+            nicknameSpan.textContent = nickname;
 
-            request.onsuccess = (event) => {
-                const cursor = event.target.result;
+            // 삭제 버튼 요소
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.textContent = 'x';
 
-                if (cursor) {
-                    // 커서가 있으면 데이터를 배열에 추가
-                    dataList.push(cursor.value);
-                    // 다음 데이터로 이동
-                    cursor.continue();
-                } else {
-                    // 더 이상 데이터가 없으면 완료
-                    console.log('모든 데이터 읽기 완료:', dataList);
+            // 삭제 이벤트 리스너 추가
+            removeBtn.addEventListener('click', (event) => {
+                // IndexedDB 삭제 로직 (별도의 함수 필요)
+                console.log(`[${serverName}] ${nickname} (ID: ${id}) 삭제 요청`);
+                deleteCharacter(serverName, nickname);
+                tagDiv.remove(); // DOM에서도 즉시 제거
+            });
+
+            tagDiv.appendChild(serverSpan);
+            tagDiv.appendChild(nicknameSpan);
+            tagDiv.appendChild(removeBtn);
+
+            return tagDiv;
+        }
+
+        function deleteCharacter(serverName, nickname) {
+            const transaction = db.transaction([CHARACTER_STORE], 'readonly');
+            const store = transaction.objectStore(CHARACTER_STORE);
+
+            const getReq = store.get(1);
+
+            getReq.onsuccess = (event) => {
+                const characterObject = event.target.result;
+
+                const character = characterObject[serverName][nickname];
+                if (character) {
+                    delete characterObject[serverName][nickname];
+                    store.put(character);
                 }
-            };
+            }
 
-            request.onerror = (event) => {
-                console.error('데이터 읽기 오류:', event.target.error);
+            getReq.onerror = (event) => {
+                console.error(`캐릭터 리스트 삭제 실패`, event);
             };
         }
 
