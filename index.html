@@ -628,6 +628,7 @@
                 const el = document.getElementById('infoNotice');
                 el.style.background = `url('https://img-api.neople.co.kr/df/servers/${SERVER_ID}/characters/${characterId}?zoom=1') no-repeat center`
 
+                loadAndDisplayTags();
                 resetGlobalData();
 
                 const set = await getCharacterEquipment(characterId);
