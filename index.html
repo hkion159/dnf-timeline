@@ -594,7 +594,7 @@
             let allTimelineRows = [];
             let currentMonthStart = new Date('2025-01-01');
             let start = new Date('2025-01-01');
-            const timelines = await getTimelines(characterId);
+            const timelines = (await getTimelines(characterId)).reverse();
             const lastTimeline = timelines[timelines.length - 1];
             if (lastTimeline) {
                 start = new Date(lastTimeline.date);
