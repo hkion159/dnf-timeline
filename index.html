@@ -719,26 +719,6 @@
             await Promise.all(fetchPromises);
         }
 
-        // 3. 아이템 상세 정보 조회 (캐시 사용)
-        const itemDetailCache = new Map();
-        async function getItemDetails(itemId) {
-            if (itemDetailCache.has(itemId)) {
-                return itemDetailCache.get(itemId);
-            }
-
-            const url = `${PROXY_BASE_URL}/items/${itemId}`;
-            try {
-                const response = await fetch(url);
-                if (!response.ok) return null; // 조회 실패 시 null 반환
-                const data = await response.json();
-                itemDetailCache.set(itemId, data); // 캐시에 저장
-                return data;
-            } catch (e) {
-                console.error(`아이템(${itemId}) 상세 조회 실패:`, e);
-                return null;
-            }
-        }
-
         // --- 메인 로직 ---
         async function startSearch() {
             const characterName = charInput.value.trim();
@@ -752,7 +732,6 @@
             charInput.readonly = true;
             statusEl.textContent = "조회를 시작합니다...";
             resultsEl.innerHTML = "";
-            itemDetailCache.clear(); // 아이템 캐시 초기화
 
             try {
                 // 1. 캐릭터 ID 가져오기
@@ -774,7 +753,7 @@
                     return;
                 }
 
-
+                const itemDetails = await getAllItemDetails();
 
                 // 3. 타임라인 처리 (오래된 순으로 정렬)
                 statusEl.textContent = "타임라인 처리 중... (아이템 상세 정보 조회)";
@@ -795,7 +774,7 @@
                     const code = itemDrop.code;
 
                     // 3-1. 아이템 상세 정보 조회
-                    const details = await getItemDetail(itemId);
+                    const details = itemDetails[itemId];
 
                     // 3-2. 유효성 검사: 115레벨이 아니거나, 세트 아이템이 아니면 무시
                     if (!details || details.itemAvailableLevel !== 115 || !details.setItemName) {
@@ -1334,6 +1313,30 @@
 
         // 페이지 로드 시 DB 연결 시작
         openDatabase();
+
+        function getAllItemDetails() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([ITEM_STORE], 'readonly');
+                const store = transaction.objectStore(ITEM_STORE);
+
+                const getReq = store.get(DEFAULT_ID);
+
+                getReq.onsuccess = (event) => {
+                    const itemObject = event.target.result || {};
+
+                    if (itemObject) {
+                        resolve(itemObject);
+                    } else {
+                        reject('아이템 상세정보가 비었습니다.');
+                    }
+                }
+
+                getReq.onerror = (event) => {
+                    console.error(`아이템 상세정보 조회 실패`, event);
+                    reject(`아이템 상세정보 조회 실패`, event.target.error)
+                };
+            });
+        }
 
         function getItemDetail(itemId) {
             return new Promise((resolve, reject) => {
