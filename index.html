@@ -651,7 +651,7 @@
             await getTimelineItemDetails(allItemIds);
 
             await setTimelines([...timelines, ...allTimelineRows]);
-            
+
             return allTimelineRows;
         }
 
@@ -1449,7 +1449,7 @@
 
         function setTimelines(characterId, timelines) {
             return new Promise((resolve, reject) => {
-                const transaction = db.transaction([TIMELINE_STORE], 'readonly');
+                const transaction = db.transaction([TIMELINE_STORE], 'readwrite');
                 const store = transaction.objectStore(TIMELINE_STORE);
 
                 const getReq = store.get(DEFAULT_ID);
