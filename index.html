@@ -413,6 +413,8 @@
                 getRequest.onsuccess = (event) => {
                     const characterObject = event.target.result;
 
+                    console.log(`characters indexeddb`, characterObject, event);
+
                     if (characterObject) {
                         const serverObject = characterObject[SERVER_ID];
                         if (!serverObject) {
