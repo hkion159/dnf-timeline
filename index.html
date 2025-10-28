@@ -594,7 +594,7 @@
             let allTimelineRows = [];
             let currentMonthStart = new Date('2025-01-01');
             let start = new Date('2025-01-01');
-            const timelines = (await getTimelines(characterId)).reverse();
+            const timelines = await getTimelines(characterId);
             const lastTimeline = timelines[timelines.length - 1];
             if (lastTimeline) {
                 start = new Date(lastTimeline.date);
@@ -619,14 +619,14 @@
                     const response = await fetch(url);
                     const data = await response.json();
                     if (data.timeline && data.timeline.rows) {
-                        allTimelineRows.push(...data.timeline.rows);
+                        allTimelineRows.push(...(data.timeline.rows.reverse()));
                     }
                     if (data.timeline.next) {
                         const urlNext = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters/${characterId}/timeline?next=${data.timeline.next}`;
                         const responseNext = await fetch(urlNext);
                         const dataNext = await responseNext.json();
                         if (dataNext.timeline && dataNext.timeline.rows) {
-                            allTimelineRows.push(...dataNext.timeline.rows);
+                            allTimelineRows.push(...(dataNext.timeline.rows.reverse()));
                         }
                     }
                 } catch (e) {
