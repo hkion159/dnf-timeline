@@ -421,7 +421,11 @@
                             store.put({ ...characterObject, [SERVER_ID]: {} });
                         } else {
                             const characterId = serverObject[characterName];
-                            resolve(characterId);
+                            if (!characterId) {
+                                resolve(getCharacterIdApi());
+                            } else {
+                                resolve(characterId);
+                            }
                         }
                     } else {
                         console.log(`characters를 찾을 수 없습니다.`);
