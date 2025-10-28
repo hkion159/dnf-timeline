@@ -478,10 +478,21 @@
                             const character = data.rows[0];
                             const transaction = db.transaction([CHARACTER_STORE], 'readwrite');
                             const store = transaction.objectStore(CHARACTER_STORE);
-                            const putReq = store.put({ [SERVER_ID]: { [character.characterName]: character.characterId } });
-                            putReq.onsuccess = (event) => {
-                                resolve(character.characterId);
-                            };
+                            const getReq = store.get(1);
+                            getReq.onsuccess = (event) => {
+                                const characterObject = event.target.result;
+                                const serverObject = characterObject[SERVER_ID] || {};
+                                const putReq = store.put({ [SERVER_ID]: { ...serverObject, [character.characterName]: character.characterId } });
+                                putReq.onsuccess = (event) => {
+                                    resolve(character.characterId);
+                                };
+                                putReq.onerror = (event) => {
+                                    reject(`put character id error`, event.target.error);
+                                }
+                            }
+                            getReq.onerror = (event) => {
+                                reject(`get character id error`, event.target.error);
+                            }
                         });
                     })
                 }
@@ -1205,13 +1216,13 @@
             tagDiv.appendChild(serverSpan);
             tagDiv.appendChild(nicknameSpan);
             tagDiv.appendChild(removeBtn);
-            tagDiv.onclick=()=>handleTagClick(serverName, nickname)
+            tagDiv.onclick = () => handleTagClick(serverName, nickname)
 
             return tagDiv;
         }
 
         function handleTagClick(serverName, nickname) {
-            SERVER_ID = serverData.find((server)=>server.serverName === serverName).serverId;
+            SERVER_ID = serverData.find((server) => server.serverName === serverName).serverId;
             charInput.value = nickname;
             startSearch();
         }
