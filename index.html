@@ -907,6 +907,9 @@
                     } else if (itemRarity === '태초' && !isValid) {
                         resultClass = 'result-fail-high-prob';
                         resultText = '태초중복☠';
+                    } else if (itemRarity === '태초' && isValid && set === setItemName) {
+                        resultClass = 'result-success-low-prob';
+                        resultText = '내태초❤';
                     } else if (itemRarity === '태초' && isValid && roundedProbability <= 34) {
                         resultClass = 'result-success-low-prob';
                         resultText = '태초3셋sex';
