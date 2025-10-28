@@ -687,7 +687,7 @@
                         const last = chanceSeqTimeline[seqLength - 1];
 
                         if (isValid !== last.isValid) {
-                            const tempSeqTimeline = chanceSeqTimeline;
+                            const tempSeqTimeline = [...chanceSeqTimeline];
 
                             // 연속 정보 초기화
                             chanceSeqTimeline = [];
