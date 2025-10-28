@@ -441,9 +441,6 @@
 
         let chanceSeqTimeline = [];
 
-        // 전역 캐시 객체: 아이템 ID를 키(Key)로, 아이템 상세 정보를 값(Value)으로 저장
-        const itemDetailsCache = {};
-
         // 🚨 아이템 획득 시점까지의 세트 부위 점유 상태를 추적하는 객체
         // Key: "세트이름-희귀도" (예: "세렌디피티 세트-에픽")
         // Value: Set 객체로, 이미 획득한 슬롯 부위 이름들을 저장합니다.
@@ -484,6 +481,8 @@
             "에픽": 2,
             "레전더리": 1
         };
+
+        const lastTimelineDate = null;
 
         // --- DOM 요소 ---
         const charInput = document.getElementById('characterNameInput');
@@ -659,14 +658,8 @@
         // 타임라인에서 필요한 모든 아이템 ID 목록을 받아 정보를 조회하고 캐시에 저장합니다.
         async function getTimelineItemDetails(allItemIds) {
             const uniqueItemIds = Array.from(new Set(allItemIds));
-            const itemIdsToFetch = [];
-
-            // 1. 캐시 확인 및 조회할 목록 분류
-            for (const itemId of uniqueItemIds) {
-                if (!itemDetailsCache[itemId]) {
-                    itemIdsToFetch.push(itemId); // 캐시에 없는 아이템만 조회 목록에 추가
-                }
-            }
+            const itemsHas = await getAllItemIds();
+            const itemIdsToFetch = arrayDifference(uniqueItemIds, itemsHas);
 
             if (itemIdsToFetch.length === 0) {
                 console.log("[Multi-Fetch] All items found in cache.");
@@ -700,7 +693,7 @@
                             if (data.rows) {
                                 for (const itemData of data.rows) {
                                     const itemId = itemData.itemId;
-                                    itemDetailsCache[itemId] = itemData; // 캐시 업데이트
+                                    setItemDetail(itemData);
                                 }
                             }
                         })
@@ -791,7 +784,8 @@
                     const code = itemDrop.code;
 
                     // 3-1. 아이템 상세 정보 조회
-                    const details = itemDetailsCache[itemId];
+                    // const details = itemDetailsCache[itemId];
+                    const details = getItemDetail(itemId);
 
                     // 3-2. 유효성 검사: 115레벨이 아니거나, 세트 아이템이 아니면 무시
                     if (!details || details.itemAvailableLevel !== 115 || !details.setItemName) {
@@ -1330,6 +1324,96 @@
 
         // 페이지 로드 시 DB 연결 시작
         openDatabase();
+
+        function getItemDetail(itemId) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([ITEM_STORE], 'readonly');
+                const store = transaction.objectStore(ITEM_STORE);
+
+                const getReq = store.get(DEFAULT_ID);
+
+                getReq.onsuccess = (event) => {
+                    const itemObject = event.target.result || {};
+
+                    const item = itemObject[itemId];
+                    if (item) {
+                        resolve(item);
+                    } else {
+                        reject('아이템 상세정보가 비었습니다.');
+                    }
+                }
+
+                getReq.onerror = (event) => {
+                    console.error(`아이템 상세정보 조회 실패`, event);
+                    reject(`아이템 상세정보 조회 실패`, event.target.error)
+                };
+            });
+        }
+
+        function getAllItemIds() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([ITEM_STORE], 'readonly');
+                const store = transaction.objectStore(ITEM_STORE);
+
+                const getReq = store.get(DEFAULT_ID);
+
+                getReq.onsuccess = (event) => {
+                    const itemObject = event.target.result || {};
+
+                    resolve(Object.keys(itemObject));
+                }
+
+                getReq.onerror = (event) => {
+                    console.error(`아이템 상세정보 조회 실패`, event);
+                    reject(`아이템 상세정보 조회 실패`, event.target.error)
+                };
+            });
+        }
+
+        function setItemDetail(itemData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([ITEM_STORE], 'readwrite');
+                const store = transaction.objectStore(ITEM_STORE);
+
+                const getReq = store.get(DEFAULT_ID);
+
+                getReq.onsuccess = (event) => {
+                    const itemObject = event.target.result || {};
+
+                    const result = { ...itemObject, [itemData.itemKey]: itemData };
+
+                    const putReq = store.put(DEFAULT_ID);
+
+                    putReq.onsuccess = (event) => {
+                        resolve(event.target.result);
+                    }
+
+                    putReq.onerror = (event) => {
+                        console.error(`아이템 상세정보 저장 실패`, event);
+                        reject(`아이템 상세정보 저장 실패`, event.target.error);
+                    };
+                }
+
+                getReq.onerror = (event) => {
+                    console.error(`아이템 상세정보 저장 실패`, event);
+                    reject(`아이템 상세정보 저장 실패`, event.target.error);
+                };
+            });
+        }
+
+        /**
+         * 배열 A에서 배열 B와 겹치는 원소를 제거한 새로운 배열 (A - B)을 반환합니다.
+         * @param {Array} arrA 기준이 되는 배열
+         * @param {Array} arrB 제거할 원소를 포함하는 배열
+         * @returns {Array} 차집합 결과 배열
+         */
+        function arrayDifference(arrA, arrB) {
+            // 1. 배열 B를 Set으로 변환하여 검색 속도를 O(1)로 만듭니다.
+            const setB = new Set(arrB);
+
+            // 2. 배열 A를 순회하며 Set B에 없는 원소만 필터링합니다.
+            return arrA.filter(item => !setB.has(item));
+        }
     </script>
 
 </body>
