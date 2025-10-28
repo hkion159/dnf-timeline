@@ -1100,9 +1100,11 @@
 
                 // 3. 조회된 데이터를 순회하며 태그 생성
                 characterList.forEach(charactersObject => {
-                    Object.entries((serverName, nickname) => {
-                        const tag = createNicknameTag(serverName, nickname);
-                        container.appendChild(tag);
+                    Object.keys((serverName) => {
+                        Object.keys((nickname) => {
+                            const tag = createNicknameTag(serverName, nickname);
+                            container.appendChild(tag);
+                        })
                     });
                 });
 
