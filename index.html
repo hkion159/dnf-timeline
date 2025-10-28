@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,26 +13,30 @@
             margin: 0;
             padding: 20px;
         }
+
         .container {
             /* max-width: 900px; */
             margin: 0 auto;
             background-color: #ffffff;
             padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
+
         h1 {
             color: #1a1a1a;
             text-align: center;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
         }
+
         .input-area {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
             max-width: 600px;
         }
+
         #characterNameInput {
             flex-grow: 1;
             padding: 10px 12px;
@@ -39,6 +44,7 @@
             border-radius: 4px;
             font-size: 16px;
         }
+
         #searchButton {
             padding: 10px 20px;
             border: none;
@@ -50,13 +56,16 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
+
         #searchButton:hover {
             background-color: #0056b3;
         }
+
         #searchButton:disabled {
             background-color: #ccc;
             cursor: not-allowed;
         }
+
         #status {
             text-align: center;
             margin: 20px 0;
@@ -64,129 +73,147 @@
             color: #555;
             font-weight: bold;
         }
+
         .results-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        .results-table th, .results-table td {
+
+        .results-table th,
+        .results-table td {
             border: 1px solid #ddd;
             padding: 10px;
             text-align: left;
             font-size: 14px;
         }
+
         .results-table th {
             background-color: #f9f9f9;
         }
+
         .valid-true {
             color: #28a745;
             font-weight: bold;
         }
+
         .valid-false {
             color: #dc3545;
         }
+
         /* 확률 셀 스타일 */
-.probability-cell {
-    font-weight: bold;
-    text-align: center !important;
-    padding: 8px;
-    border-radius: 4px;
-}
+        .probability-cell {
+            font-weight: bold;
+            text-align: center !important;
+            padding: 8px;
+            border-radius: 4px;
+        }
 
-/* 4구간 스타일 정의 (0%~100%) */
+        /* 4구간 스타일 정의 (0%~100%) */
 
-/* 구간 1: 0% ~ 25% (가장 낮은 확률, 나쁨 - 빨강/주황) */
-.prob-low {
-    background-color: #ff9999; /* 밝은 빨강 */
-    color: #800000;
-}
+        /* 구간 1: 0% ~ 25% (가장 낮은 확률, 나쁨 - 빨강/주황) */
+        .prob-low {
+            background-color: #ff9999;
+            /* 밝은 빨강 */
+            color: #800000;
+        }
 
-/* 구간 2: 26% ~ 50% (보통 - 노랑) */
-.prob-mid-low {
-    background-color: #ffda6a; /* 노란색 */
-    color: #995c00;
-}
+        /* 구간 2: 26% ~ 50% (보통 - 노랑) */
+        .prob-mid-low {
+            background-color: #ffda6a;
+            /* 노란색 */
+            color: #995c00;
+        }
 
-/* 구간 3: 51% ~ 75% (좋음 - 연두) */
-.prob-mid-high {
-    background-color: #b3e6b3; /* 밝은 녹색 */
-    color: #004d00;
-}
+        /* 구간 3: 51% ~ 75% (좋음 - 연두) */
+        .prob-mid-high {
+            background-color: #b3e6b3;
+            /* 밝은 녹색 */
+            color: #004d00;
+        }
 
-/* 구간 4: 76% ~ 100% (가장 높은 확률, 매우 좋음 - 파랑/초록) */
-.prob-high {
-    background-color: #8cd98c; /* 진한 녹색 */
-    color: #003300;
-}
+        /* 구간 4: 76% ~ 100% (가장 높은 확률, 매우 좋음 - 파랑/초록) */
+        .prob-high {
+            background-color: #8cd98c;
+            /* 진한 녹색 */
+            color: #003300;
+        }
 
         /* 유효 확률은 낮았는데 성공한 경우 (운이 좋음 - 녹색 강조) */
-.result-success-low-prob {
-    font-weight: bold;
-    background-color: #d4edda; /* 밝은 초록색 배경 */
-    color: #155724; /* 짙은 초록색 텍스트 */
-    border: 1px solid #c3e6cb;
-}
+        .result-success-low-prob {
+            font-weight: bold;
+            background-color: #d4edda;
+            /* 밝은 초록색 배경 */
+            color: #155724;
+            /* 짙은 초록색 텍스트 */
+            border: 1px solid #c3e6cb;
+        }
 
         /* 유효 확률은 높았는데 실패한 경우 (운이 나쁨 - 빨간색 강조) */
-.result-fail-high-prob {
-    font-weight: bold;
-    background-color: #f8d7da; /* 밝은 빨간색 배경 */
-    color: #721c24; /* 짙은 빨간색 텍스트 */
-    border: 1px solid #f5c6cb;
-}
+        .result-fail-high-prob {
+            font-weight: bold;
+            background-color: #f8d7da;
+            /* 밝은 빨간색 배경 */
+            color: #721c24;
+            /* 짙은 빨간색 텍스트 */
+            border: 1px solid #f5c6cb;
+        }
 
-/* 일반적인 성공/실패 표시 (경고가 필요 없는 경우) */
-.result-normal {
-    font-weight: normal;
-    background-color: transparent;
-    color: inherit;
-}
+        /* 일반적인 성공/실패 표시 (경고가 필요 없는 경우) */
+        .result-normal {
+            font-weight: normal;
+            background-color: transparent;
+            color: inherit;
+        }
+
         /* 장착 중인 세트 아이템 행 강조 스타일 */
         .highlight-set {
-            background-color: #fffacd; /* 연한 노란색 */
+            background-color: #fffacd;
+            /* 연한 노란색 */
             font-weight: bold;
         }
-        
     </style>
 </head>
+
 <body>
 
     <div class="container">
         <h1>던파 득템 유효성 검사기</h1>
         <div class="input-area">
             <select id="serverSelect" onchange="saveSelectedServerId(this.value)">
-    </select>
+            </select>
             <input type="text" id="characterNameInput" placeholder="캐릭터명을 입력하세요">
             <button id="searchButton" onclick="startSearch()">조회</button>
         </div>
-        
+
         <div id="rarityFilters" style="margin-top: 15px;">
-    <label>
-        <input type="checkbox" id="filterTaecho" value="태초" onchange="filterTimeline()" checked> 태초
-    </label>
-    <label>
-        <input type="checkbox" id="filterEpic" value="에픽" onchange="filterTimeline()" checked> 에픽
-    </label>
-    <label>
-        <input type="checkbox" id="filterLegendary" value="레전더리" onchange="filterTimeline()" checked> 레전더리
-    </label>
-    </div>
+            <label>
+                <input type="checkbox" id="filterTaecho" value="태초" onchange="filterTimeline()" checked> 태초
+            </label>
+            <label>
+                <input type="checkbox" id="filterEpic" value="에픽" onchange="filterTimeline()" checked> 에픽
+            </label>
+            <label>
+                <input type="checkbox" id="filterLegendary" value="레전더리" onchange="filterTimeline()" checked> 레전더리
+            </label>
+        </div>
 
         <p id="totalRowCount" style="font-weight: bold; margin: 10px 0;">총 타임라인 수: 0</p>
 
-        <div id="infoNotice" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; background: url('https://img-api.neople.co.kr/df/servers/cain/characters/4ecd3f9eea4b6dd87044a9d9323efd20?zoom=1') no-repeat center; color: #333; border-radius: 4px;">
-    <strong>✅ 유효 확률 계산 안내</strong>
-    <p style="margin-top: 5px; margin-bottom: 0; font-size: 0.95em;">
-        <ul>
-    <li>이 표는 <b>무기</b> 및 <b>고유를 제외한</b> 타임라인을 모두 보여줍니다. <br/></li>
-    <li>항아리, 업그레이드, 초월 등은 <b>제외</b>입니다. (확률 계산엔 포함시킴) (랜덤 드랍만 보여줌)<br/></li>
-    <li>'유효 확률'은 해당 아이템을 획득할 <b>당시</b>를 기준으로 그 세트의 유효 <b>부위</b> 확률입니다. <br/></li>
-    <li>운은 먹었을 때의 결과운을 의미합니다. 많거나 적게 뜬다는 의미가 아닙니다. <br/></li>
-    <li>재미로 만든거라 DB 는 안 붙여서 매번 다시 조회해서 비효율적입니다.</li>
+        <div id="infoNotice"
+            style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; background: url('https://img-api.neople.co.kr/df/servers/cain/characters/4ecd3f9eea4b6dd87044a9d9323efd20?zoom=1') no-repeat center; color: #333; border-radius: 4px;">
+            <strong>✅ 유효 확률 계산 안내</strong>
+            <p style="margin-top: 5px; margin-bottom: 0; font-size: 0.95em;">
+            <ul>
+                <li>이 표는 <b>무기</b> 및 <b>고유를 제외한</b> 타임라인을 모두 보여줍니다. <br /></li>
+                <li>항아리, 업그레이드, 초월 등은 <b>제외</b>입니다. (확률 계산엔 포함시킴) (랜덤 드랍만 보여줌)<br /></li>
+                <li>'유효 확률'은 해당 아이템을 획득할 <b>당시</b>를 기준으로 그 세트의 유효 <b>부위</b> 확률입니다. <br /></li>
+                <li>운은 먹었을 때의 결과운을 의미합니다. 많거나 적게 뜬다는 의미가 아닙니다. <br /></li>
+                <li>재미로 만든거라 DB 는 안 붙여서 매번 다시 조회해서 비효율적입니다.</li>
             </ul>
-    </p>
-</div>
-        
+            </p>
+        </div>
+
         <div id="status"></div>
         <table class="results-table">
             <thead>
@@ -202,7 +229,7 @@
                 </tr>
             </thead>
             <tbody id="resultsContainer">
-                </tbody>
+            </tbody>
         </table>
     </div>
 
@@ -210,57 +237,57 @@
 
         // 제공된 서버 데이터
         const serverData = [
-            { "serverId" : "cain", "serverName" : "카인" },
-            { "serverId" : "diregie", "serverName" : "디레지에" },
-            { "serverId" : "siroco", "serverName" : "시로코" },
-            { "serverId" : "prey", "serverName" : "프레이" },
-            { "serverId" : "casillas", "serverName" : "카시야스" },
-            { "serverId" : "hilder", "serverName" : "힐더" },
-            { "serverId" : "anton", "serverName" : "안톤" },
-            { "serverId" : "bakal", "serverName" : "바칼" }
+            { "serverId": "cain", "serverName": "카인" },
+            { "serverId": "diregie", "serverName": "디레지에" },
+            { "serverId": "siroco", "serverName": "시로코" },
+            { "serverId": "prey", "serverName": "프레이" },
+            { "serverId": "casillas", "serverName": "카시야스" },
+            { "serverId": "hilder", "serverName": "힐더" },
+            { "serverId": "anton", "serverName": "안톤" },
+            { "serverId": "bakal", "serverName": "바칼" }
         ];
-        
-// 🚨 모든 타임라인 데이터를 저장할 전역 변수 🚨
-let allTimelinePages = [];
-let filteredTimelinePages = [];
+
+        // 🚨 모든 타임라인 데이터를 저장할 전역 변수 🚨
+        let allTimelinePages = [];
+        let filteredTimelinePages = [];
 
         let chanceSeqTimeline = [];
-        
+
         // 전역 캐시 객체: 아이템 ID를 키(Key)로, 아이템 상세 정보를 값(Value)으로 저장
         const itemDetailsCache = {};
-        
+
         // 🚨 아이템 획득 시점까지의 세트 부위 점유 상태를 추적하는 객체
-// Key: "세트이름-희귀도" (예: "세렌디피티 세트-에픽")
-// Value: Set 객체로, 이미 획득한 슬롯 부위 이름들을 저장합니다.
-let setSlotTracker = {};
+        // Key: "세트이름-희귀도" (예: "세렌디피티 세트-에픽")
+        // Value: Set 객체로, 이미 획득한 슬롯 부위 이름들을 저장합니다.
+        let setSlotTracker = {};
 
         // 🚨 희귀도 순위 정의 (높을수록 낮은 순위 값) 🚨
-// 비교를 위해 순위를 부여합니다.
-const RARITY_RANK = {
-    '태초': 1,
-    '에픽': 2,
-    '레전더리': 3 
-    // 무기는 제외, 나머지 희귀도는 VALID_RARITIES에서 제외
-};
-        
+        // 비교를 위해 순위를 부여합니다.
+        const RARITY_RANK = {
+            '태초': 1,
+            '에픽': 2,
+            '레전더리': 3
+            // 무기는 제외, 나머지 희귀도는 VALID_RARITIES에서 제외
+        };
+
         // 전체 세트 부위 수 (무기 제외 11개)
-const TOTAL_SET_SLOTS = 11; 
-// 유효 희귀도 목록
-const VALID_RARITIES = ['태초', '에픽', '레전더리'];
+        const TOTAL_SET_SLOTS = 11;
+        // 유효 희귀도 목록
+        const VALID_RARITIES = ['태초', '에픽', '레전더리'];
 
         // 🚨 태초 아이템의 실제 세트 부위 (액세서리 3종) 🚨
-const TAECHO_SLOTS = ['팔찌', '목걸이', '반지'];
-const MAX_TAECHO_SLOTS = TAECHO_SLOTS.length; // 3
+        const TAECHO_SLOTS = ['팔찌', '목걸이', '반지'];
+        const MAX_TAECHO_SLOTS = TAECHO_SLOTS.length; // 3
 
-        const VALID_SLOTS = ['상의','머리어깨','하의','벨트','신발','팔찌','목걸이','반지','보조장비','마법석','귀걸이'];
-        
+        const VALID_SLOTS = ['상의', '머리어깨', '하의', '벨트', '신발', '팔찌', '목걸이', '반지', '보조장비', '마법석', '귀걸이'];
+
         // --- 설정 및 상수 ---
-// *** 프록시 서버의 기본 경로를 정의합니다. ***
-// Vercel에 배포된 경우, /api/proxy는 api/proxy.js 서버리스 함수로 연결됩니다.
-const PROXY_BASE_URL = "/api/proxy/df"; // Neople API의 /df 이전 경로를 프록시로 지정
-        
+        // *** 프록시 서버의 기본 경로를 정의합니다. ***
+        // Vercel에 배포된 경우, /api/proxy는 api/proxy.js 서버리스 함수로 연결됩니다.
+        const PROXY_BASE_URL = "/api/proxy/df"; // Neople API의 /df 이전 경로를 프록시로 지정
+
         let SERVER_ID = "cain";
-        
+
         // 아이템 등급 우선순위 (높을수록 좋음)
         const RARITY_ORDER = {
             "태초": 3,
@@ -278,13 +305,13 @@ const PROXY_BASE_URL = "/api/proxy/df"; // Neople API의 /df 이전 경로를 �
  * 캐릭터명 입력창에서 Enter 키를 눌렀을 때 startSearch() 함수를 호출합니다.
  * @param {Event} event - 키보드 이벤트 객체
  */
-function handleEnterKey(event) {
-    // Enter 키의 keyCode는 13입니다.
-    if (event.key === 'Enter' || event.keyCode === 13) {
-        event.preventDefault(); // 기본 Enter 동작(폼 제출 등) 방지
-        startSearch();         // 조회 시작 함수 호출
-    }
-}
+        function handleEnterKey(event) {
+            // Enter 키의 keyCode는 13입니다.
+            if (event.key === 'Enter' || event.keyCode === 13) {
+                event.preventDefault(); // 기본 Enter 동작(폼 제출 등) 방지
+                startSearch();         // 조회 시작 함수 호출
+            }
+        }
 
         // --- API 호출 함수 ---
 
@@ -305,7 +332,7 @@ function handleEnterKey(event) {
             if (!response.ok) throw new Error("캐릭터 장비 조회 실패");
             const data = await response.json();
             if (!data.equipment || data.equipment.length === 0) throw new Error("캐릭터 장비 조회를 실패했습니다.");
-            return data.equipment.find(e=>e.setItemName)?.setItemName;
+            return data.equipment.find(e => e.setItemName)?.setItemName;
         }
 
         // 2. 타임라인 조회 (월별로 반복 호출)
@@ -320,15 +347,15 @@ function handleEnterKey(event) {
                 if (nextMonthStart > today) {
                     nextMonthStart = today;
                 }
-                
+
                 // 날짜 포맷팅 (YYYYMMDD)
                 const startDateStr = formatDate(currentMonthStart);
                 const endDateStr = nextMonthStart === today ? formatDate(nextMonthStart) + formatToApiTime(nextMonthStart) : formatDate(nextMonthStart);
 
                 statusEl.textContent = `${currentMonthStart.getFullYear()}년 ${currentMonthStart.getMonth() + 1}월 타임라인 조회 중...`;
-                
+
                 const url = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters/${characterId}/timeline?limit=100&code=505,507,513,504,511,516,514&startDate=${startDateStr}&endDate=${endDateStr}`;
-                
+
                 try {
                     const response = await fetch(url);
                     const data = await response.json();
@@ -337,11 +364,11 @@ function handleEnterKey(event) {
                     }
                     if (data.timeline.next) {
                         const urlNext = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters/${characterId}/timeline?next=${data.timeline.next}`;
-                    const responseNext = await fetch(urlNext);
-                    const dataNext = await responseNext.json();
-                    if (dataNext.timeline && dataNext.timeline.rows) {
-                        allTimelineRows.push(...dataNext.timeline.rows);
-                    }
+                        const responseNext = await fetch(urlNext);
+                        const dataNext = await responseNext.json();
+                        if (dataNext.timeline && dataNext.timeline.rows) {
+                            allTimelineRows.push(...dataNext.timeline.rows);
+                        }
                     }
                 } catch (e) {
                     console.error(`${startDateStr} 타임라인 조회 실패:`, e);
@@ -353,85 +380,85 @@ function handleEnterKey(event) {
             }
 
             const allItemIds = [];
-    allTimelineRows.forEach(row => {
-            if (row.data && row.data.itemId) {
-                // itemId가 쉼표로 분리되어 있을 수 있으므로 모두 추출
-                const ids = row.data.itemId.split(',').map(id => id.trim()).filter(id => id.length > 0);
-                allItemIds.push(...ids);
-            }
-        });
+            allTimelineRows.forEach(row => {
+                if (row.data && row.data.itemId) {
+                    // itemId가 쉼표로 분리되어 있을 수 있으므로 모두 추출
+                    const ids = row.data.itemId.split(',').map(id => id.trim()).filter(id => id.length > 0);
+                    allItemIds.push(...ids);
+                }
+            });
 
-    // 수집된 모든 아이템 ID에 대해 다중 조회 함수 호출
-    await getTimelineItemDetails(allItemIds);
+            // 수집된 모든 아이템 ID에 대해 다중 조회 함수 호출
+            await getTimelineItemDetails(allItemIds);
             return allTimelineRows;
         }
 
-// ⚠️ 추가: API가 요구하는 hhmm 형식으로 시간을 포맷하는 헬퍼 함수
-function formatToApiTime(date) {
-    const hh = String(date.getHours()).padStart(2, '0');
-    const mm = String(date.getMinutes()).padStart(2, '0');
-    return `T${hh}${mm}`;
-}
+        // ⚠️ 추가: API가 요구하는 hhmm 형식으로 시간을 포맷하는 헬퍼 함수
+        function formatToApiTime(date) {
+            const hh = String(date.getHours()).padStart(2, '0');
+            const mm = String(date.getMinutes()).padStart(2, '0');
+            return `T${hh}${mm}`;
+        }
 
         // 기존: getItemDetails(itemId)를 대체하는 함수
-// 타임라인에서 필요한 모든 아이템 ID 목록을 받아 정보를 조회하고 캐시에 저장합니다.
-async function getTimelineItemDetails(allItemIds) {
-    const uniqueItemIds = Array.from(new Set(allItemIds));
-    const itemIdsToFetch = [];
-    
-    // 1. 캐시 확인 및 조회할 목록 분류
-    for (const itemId of uniqueItemIds) {
-        if (!itemDetailsCache[itemId]) {
-            itemIdsToFetch.push(itemId); // 캐시에 없는 아이템만 조회 목록에 추가
+        // 타임라인에서 필요한 모든 아이템 ID 목록을 받아 정보를 조회하고 캐시에 저장합니다.
+        async function getTimelineItemDetails(allItemIds) {
+            const uniqueItemIds = Array.from(new Set(allItemIds));
+            const itemIdsToFetch = [];
+
+            // 1. 캐시 확인 및 조회할 목록 분류
+            for (const itemId of uniqueItemIds) {
+                if (!itemDetailsCache[itemId]) {
+                    itemIdsToFetch.push(itemId); // 캐시에 없는 아이템만 조회 목록에 추가
+                }
+            }
+
+            if (itemIdsToFetch.length === 0) {
+                console.log("[Multi-Fetch] All items found in cache.");
+                return; // 조회할 아이템이 없으면 종료
+            }
+
+            console.log(`[Multi-Fetch] Need to fetch ${itemIdsToFetch.length} items.`);
+
+            // 2. 아이템 ID를 최대 15개씩 묶어 API 호출
+            const CHUNK_SIZE = 15;
+            const fetchPromises = [];
+
+            for (let i = 0; i < itemIdsToFetch.length; i += CHUNK_SIZE) {
+                const chunk = itemIdsToFetch.slice(i, i + CHUNK_SIZE);
+                const itemIdsParam = chunk.join(','); // 아이템 ID들을 콤마로 연결
+
+                // 다중 조회 API URL
+                const url = `${PROXY_BASE_URL}/multi/items?itemIds=${encodeURIComponent(itemIdsParam)}`;
+
+                // 프록시 서버에 요청을 보내고 Promise를 배열에 저장
+                fetchPromises.push(
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`다중 아이템 조회 실패: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // 3. 응답 데이터를 파싱하여 캐시에 저장
+                            if (data.rows) {
+                                for (const itemData of data.rows) {
+                                    const itemId = itemData.itemId;
+                                    itemDetailsCache[itemId] = itemData; // 캐시 업데이트
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error(`아이템 묶음 조회 중 오류 발생: ${error.message}`);
+                            // 오류 발생 시 해당 아이템들의 캐시 항목은 undefined로 남습니다.
+                        })
+                );
+            }
+
+            // 4. 모든 API 호출이 완료될 때까지 기다립니다.
+            await Promise.all(fetchPromises);
         }
-    }
-
-    if (itemIdsToFetch.length === 0) {
-        console.log("[Multi-Fetch] All items found in cache.");
-        return; // 조회할 아이템이 없으면 종료
-    }
-
-    console.log(`[Multi-Fetch] Need to fetch ${itemIdsToFetch.length} items.`);
-
-    // 2. 아이템 ID를 최대 15개씩 묶어 API 호출
-    const CHUNK_SIZE = 15;
-    const fetchPromises = [];
-
-    for (let i = 0; i < itemIdsToFetch.length; i += CHUNK_SIZE) {
-        const chunk = itemIdsToFetch.slice(i, i + CHUNK_SIZE);
-        const itemIdsParam = chunk.join(','); // 아이템 ID들을 콤마로 연결
-
-        // 다중 조회 API URL
-        const url = `${PROXY_BASE_URL}/multi/items?itemIds=${encodeURIComponent(itemIdsParam)}`;
-        
-        // 프록시 서버에 요청을 보내고 Promise를 배열에 저장
-        fetchPromises.push(
-            fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`다중 아이템 조회 실패: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // 3. 응답 데이터를 파싱하여 캐시에 저장
-                if (data.rows) {
-                    for (const itemData of data.rows) {
-                        const itemId = itemData.itemId;
-                        itemDetailsCache[itemId] = itemData; // 캐시 업데이트
-                    }
-                }
-            })
-            .catch(error => {
-                console.error(`아이템 묶음 조회 중 오류 발생: ${error.message}`);
-                // 오류 발생 시 해당 아이템들의 캐시 항목은 undefined로 남습니다.
-            })
-        );
-    }
-
-    // 4. 모든 API 호출이 완료될 때까지 기다립니다.
-    await Promise.all(fetchPromises);
-}
 
         // 3. 아이템 상세 정보 조회 (캐시 사용)
         const itemDetailCache = new Map();
@@ -439,7 +466,7 @@ async function getTimelineItemDetails(allItemIds) {
             if (itemDetailCache.has(itemId)) {
                 return itemDetailCache.get(itemId);
             }
-            
+
             const url = `${PROXY_BASE_URL}/items/${itemId}`;
             try {
                 const response = await fetch(url);
@@ -454,7 +481,7 @@ async function getTimelineItemDetails(allItemIds) {
         }
 
         // --- 메인 로직 ---
-         async function startSearch() {
+        async function startSearch() {
             const characterName = charInput.value.trim();
             if (!characterName) {
                 alert("캐릭터명을 입력해주세요.");
@@ -463,7 +490,7 @@ async function getTimelineItemDetails(allItemIds) {
 
             // 초기화
             searchBtn.disabled = true;
-             charInput.readonly = true;
+            charInput.readonly = true;
             statusEl.textContent = "조회를 시작합니다...";
             resultsEl.innerHTML = "";
             itemDetailCache.clear(); // 아이템 캐시 초기화
@@ -476,20 +503,20 @@ async function getTimelineItemDetails(allItemIds) {
                 el.style.background = `url('https://img-api.neople.co.kr/df/servers/${SERVER_ID}/characters/${characterId}?zoom=1') no-repeat center`
 
                 resetGlobalData();
-                
+
                 const set = await getCharacterEquipment(characterId);
-                
+
                 // 2. 모든 타임라인 데이터 가져오기 (월별)
                 const allTimelineRows = await getAllTimelinePages(characterId);
-                
+
                 if (allTimelineRows.length === 0) {
                     statusEl.textContent = "조회 기간 내 아이템 획득 기록이 없습니다.";
                     searchBtn.disabled = false;
-             charInput.readonly = false;
+                    charInput.readonly = false;
                     return;
                 }
 
-                
+
 
                 // 3. 타임라인 처리 (오래된 순으로 정렬)
                 statusEl.textContent = "타임라인 처리 중... (아이템 상세 정보 조회)";
@@ -502,7 +529,7 @@ async function getTimelineItemDetails(allItemIds) {
                 for (const itemDrop of allTimelineRows) {
                     processedCount++;
                     statusEl.textContent = `타임라인 처리 중... (${processedCount}/${allTimelineRows.length})`;
-                    
+
                     const dropData = itemDrop.data;
                     const itemId = dropData.itemId;
                     const itemRarity = dropData.itemRarity;
@@ -521,182 +548,182 @@ async function getTimelineItemDetails(allItemIds) {
                     const itemTypeDetail = details.itemTypeDetail;
 
                     if (!VALID_SLOTS.includes(itemTypeDetail)) continue;
-                    
+
                     // 3-3. 유효성 로직 실행
                     const itemKey = `${setItemName}_${itemTypeDetail}`;
                     const currentRarityScore = RARITY_ORDER[itemRarity] || 0;
                     const highestRarityScore = highestAcquiredRarity[itemKey] || 0;
 
                     let isValid = false;
-                    
+
                     // 🚨 희귀도별 스타일을 저장할 변수 🚨
                     let itemStyle = '';
 
                     // 1. 아이템 희귀도에 따른 스타일 결정
-                        if (itemRarity === '레전더리') {
-                            itemStyle = 'color: rgb(239, 112, 0);';
-                        } else if (itemRarity === '에픽') {
-                            itemStyle = 'color: rgb(239, 169, 0);';
-                        } else if (itemRarity === '태초') {
-                            // 그라데이션은 CSS background로 적용하는 것이 일반적이나, 
-                            // 텍스트에만 적용하려면 웹킷(WebKit) 속성을 사용해야 합니다.
-                            // 여기서는 텍스트 색상을 설정하고, 셀 배경에 적용하는 방식으로 처리하겠습니다.
-                            itemStyle = 'color: #3057a6; font-weight: bold; background-image: linear-gradient(180deg, #55e95b, #3057a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;';
-                            // ⚠️ 주의: 웹킷(Chrome, Safari) 브라우저에서만 정상적으로 텍스트 그라데이션이 보입니다.
-                        } else {
-                            itemStyle = ''; // 기타 희귀도는 기본 스타일
-                        }
+                    if (itemRarity === '레전더리') {
+                        itemStyle = 'color: rgb(239, 112, 0);';
+                    } else if (itemRarity === '에픽') {
+                        itemStyle = 'color: rgb(239, 169, 0);';
+                    } else if (itemRarity === '태초') {
+                        // 그라데이션은 CSS background로 적용하는 것이 일반적이나, 
+                        // 텍스트에만 적용하려면 웹킷(WebKit) 속성을 사용해야 합니다.
+                        // 여기서는 텍스트 색상을 설정하고, 셀 배경에 적용하는 방식으로 처리하겠습니다.
+                        itemStyle = 'color: #3057a6; font-weight: bold; background-image: linear-gradient(180deg, #55e95b, #3057a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;';
+                        // ⚠️ 주의: 웹킷(Chrome, Safari) 브라우저에서만 정상적으로 텍스트 그라데이션이 보입니다.
+                    } else {
+                        itemStyle = ''; // 기타 희귀도는 기본 스타일
+                    }
 
-                
+
                     let probabilityContent = '';
                     let styleClass = ''; // 새로 추가된 스타일 변수
-                let resultClass = 'result-normal';
+                    let resultClass = 'result-normal';
                     let roundedProbability = 0;
                     let resultText = '';
-                    
+
                     // 2. 슬롯 추적기 구조: setSlotTracker[setName] = Map<Rarity, Set<SlotName>>
-                        if (!setSlotTracker[setItemName]) {
-                            setSlotTracker[setItemName] = {};
-                        }
-                        if (!setSlotTracker[setItemName][itemRarity]) {
-                            setSlotTracker[setItemName][itemRarity] = new Set();
-                        }
+                    if (!setSlotTracker[setItemName]) {
+                        setSlotTracker[setItemName] = {};
+                    }
+                    if (!setSlotTracker[setItemName][itemRarity]) {
+                        setSlotTracker[setItemName][itemRarity] = new Set();
+                    }
 
-                        // 3. 현재 희귀도의 순위 확인
-                        const targetRank = RARITY_RANK[itemRarity];
-                        let filledSlotCount = 0;
-                        const countedSlots = new Set(); // 중복 부위 카운트를 막기 위한 Set
+                    // 3. 현재 희귀도의 순위 확인
+                    const targetRank = RARITY_RANK[itemRarity];
+                    let filledSlotCount = 0;
+                    const countedSlots = new Set(); // 중복 부위 카운트를 막기 위한 Set
 
-                        // 4. 이미 채워진 부위 카운트 (순위가 같거나 더 높은 희귀도만 카운트)
-                        // '더 높은 희귀도'는 순위 값이 '더 낮거나 같은' 경우입니다.
-                        for (const r in RARITY_RANK) {
-                            if (RARITY_RANK[r] <= targetRank) {
-                                if (setSlotTracker[setItemName][r]) {
-                                    setSlotTracker[setItemName][r].forEach(slot => {
-                                        // 🚨 태초 등급 아이템일 경우, 슬롯을 3개로 제한 🚨
-                        if (itemRarity === '태초' && !TAECHO_SLOTS.includes(slot)) {
-                            return; // 태초가 아닌 부위는 카운트하지 않음
-                        }
-                                        countedSlots.add(slot);
-                                    });
-                                }
+                    // 4. 이미 채워진 부위 카운트 (순위가 같거나 더 높은 희귀도만 카운트)
+                    // '더 높은 희귀도'는 순위 값이 '더 낮거나 같은' 경우입니다.
+                    for (const r in RARITY_RANK) {
+                        if (RARITY_RANK[r] <= targetRank) {
+                            if (setSlotTracker[setItemName][r]) {
+                                setSlotTracker[setItemName][r].forEach(slot => {
+                                    // 🚨 태초 등급 아이템일 경우, 슬롯을 3개로 제한 🚨
+                                    if (itemRarity === '태초' && !TAECHO_SLOTS.includes(slot)) {
+                                        return; // 태초가 아닌 부위는 카운트하지 않음
+                                    }
+                                    countedSlots.add(slot);
+                                });
                             }
                         }
-                        // 5. 태초 아이템의 경우, 카운팅 된 부위 중 최대 3개만 유효 부위로 간주
-        if (itemRarity === '태초') {
-            filledSlotCount = Math.min(countedSlots.size, MAX_TAECHO_SLOTS);
-        } else {
-            filledSlotCount = countedSlots.size;
-        }
-                    
-                        // 5. 확률 계산
-                        if (filledSlotCount < TOTAL_SET_SLOTS) {
-                            // 남은 유효 부위 개수: 11 - 현재 획득한 부위 개수
-                            let remainingValidSlots = TOTAL_SET_SLOTS - filledSlotCount;
-                            let probability = (remainingValidSlots / TOTAL_SET_SLOTS) * 100;
-                            if (itemRarity === '태초') {
-                                remainingValidSlots = MAX_TAECHO_SLOTS - filledSlotCount;
-                                probability = (remainingValidSlots / MAX_TAECHO_SLOTS) * 100;
-                            }
+                    }
+                    // 5. 태초 아이템의 경우, 카운팅 된 부위 중 최대 3개만 유효 부위로 간주
+                    if (itemRarity === '태초') {
+                        filledSlotCount = Math.min(countedSlots.size, MAX_TAECHO_SLOTS);
+                    } else {
+                        filledSlotCount = countedSlots.size;
+                    }
 
-                            // 소수점 첫째 자리에서 반올림
-                             roundedProbability = Math.round(probability); 
-                            probabilityContent = `${roundedProbability}%`;
-
-                            // 🚨 확률 구간에 따른 스타일 클래스 결정 🚨
-                            if (roundedProbability <= 25) {
-                                styleClass = 'prob-low';
-                            } else if (roundedProbability <= 50) {
-                                styleClass = 'prob-mid-low';
-                            } else if (roundedProbability <= 75) {
-                                styleClass = 'prob-mid-high';
-                            } else { // 76% ~ 100%
-                                styleClass = 'prob-high';
-                            }
-                        } else {
-                            // 이미 11부위를 다 채운 경우
-                            probabilityContent = '0%';
-                            styleClass = 'prob-low'; // 0%는 가장 낮은 구간으로 설정
+                    // 5. 확률 계산
+                    if (filledSlotCount < TOTAL_SET_SLOTS) {
+                        // 남은 유효 부위 개수: 11 - 현재 획득한 부위 개수
+                        let remainingValidSlots = TOTAL_SET_SLOTS - filledSlotCount;
+                        let probability = (remainingValidSlots / TOTAL_SET_SLOTS) * 100;
+                        if (itemRarity === '태초') {
+                            remainingValidSlots = MAX_TAECHO_SLOTS - filledSlotCount;
+                            probability = (remainingValidSlots / MAX_TAECHO_SLOTS) * 100;
                         }
-                        
-                        // 6. 슬롯 트래커 업데이트 (확률 계산 후, 현재 아이템 부위를 추가)
+
+                        // 소수점 첫째 자리에서 반올림
+                        roundedProbability = Math.round(probability);
+                        probabilityContent = `${roundedProbability}%`;
+
+                        // 🚨 확률 구간에 따른 스타일 클래스 결정 🚨
+                        if (roundedProbability <= 25) {
+                            styleClass = 'prob-low';
+                        } else if (roundedProbability <= 50) {
+                            styleClass = 'prob-mid-low';
+                        } else if (roundedProbability <= 75) {
+                            styleClass = 'prob-mid-high';
+                        } else { // 76% ~ 100%
+                            styleClass = 'prob-high';
+                        }
+                    } else {
+                        // 이미 11부위를 다 채운 경우
+                        probabilityContent = '0%';
+                        styleClass = 'prob-low'; // 0%는 가장 낮은 구간으로 설정
+                    }
+
+                    // 6. 슬롯 트래커 업데이트 (확률 계산 후, 현재 아이템 부위를 추가)
                     // 7. 슬롯 트래커 업데이트
-        // 🚨 태초일 경우, 트래커에 추가할 때도 3개 부위만 추가하도록 제약 🚨
-        if (itemRarity === '태초' && !TAECHO_SLOTS.includes(itemTypeDetail)) {
-             // 태초 아이템이 아닌 부위 (예: 무기)로 잘못 들어왔다면 트래커에 추가하지 않음
-        } else {
+                    // 🚨 태초일 경우, 트래커에 추가할 때도 3개 부위만 추가하도록 제약 🚨
+                    if (itemRarity === '태초' && !TAECHO_SLOTS.includes(itemTypeDetail)) {
+                        // 태초 아이템이 아닌 부위 (예: 무기)로 잘못 들어왔다면 트래커에 추가하지 않음
+                    } else {
                         setSlotTracker[setItemName][itemRarity].add(itemTypeDetail);
-        }
-                    
+                    }
+
                     // 현재 획득한 아이템 등급이 이전에 획득한 최고 등급보다 높아야 유효
                     if (currentRarityScore > highestRarityScore) {
                         isValid = true;
                         highestAcquiredRarity[itemKey] = currentRarityScore; // 최고 등급 갱신
                     }
-                    
-                            if (roundedProbability <= 20 && isValid) {
-                                resultClass = 'result-success-low-prob';
-                                resultText = '운도실력';
-                            } else if (roundedProbability >= 80 && !isValid) {
-                                resultClass = 'result-fail-high-prob';
-                                resultText = '나만운없어';
-                            }   else if (itemRarity === '태초' && !isValid) {
-                                resultClass = 'result-fail-high-prob';
-                                resultText = '태초중복☠';
-                            } else if (itemRarity === '태초' && isValid && roundedProbability <= 34) {
-                                resultClass = 'result-success-low-prob';
-                                resultText = '태초3셋sex';
-                            }
+
+                    if (roundedProbability <= 20 && isValid) {
+                        resultClass = 'result-success-low-prob';
+                        resultText = '운도실력';
+                    } else if (roundedProbability >= 80 && !isValid) {
+                        resultClass = 'result-fail-high-prob';
+                        resultText = '나만운없어';
+                    } else if (itemRarity === '태초' && !isValid) {
+                        resultClass = 'result-fail-high-prob';
+                        resultText = '태초중복☠';
+                    } else if (itemRarity === '태초' && isValid && roundedProbability <= 34) {
+                        resultClass = 'result-success-low-prob';
+                        resultText = '태초3셋sex';
+                    }
 
                     let setClass = '';
                     if (set === setItemName) {
                         setClass = 'highlight-set';
-                }
+                    }
 
 
                     // 아이템 연속 운 설정
                     if (chanceSeqTimeline?.length > 0) {
-                            const seqLength = chanceSeqTimeline.length;
-                        const last = chanceSeqTimeline[seqLength-1];
-                        
+                        const seqLength = chanceSeqTimeline.length;
+                        const last = chanceSeqTimeline[seqLength - 1];
+
                         if (isValid !== last.isValid) {
                             const tempSeqTimeline = chanceSeqTimeline;
-                            
+
                             // 연속 정보 초기화
                             chanceSeqTimeline = [];
-                            
+
                             // 마지막 아이템에 결과 추가
                             if (seqLength >= 3) {
-                                console.log(`seqLength = ${seqLength}`,tempSeqTimeline);
+                                console.log(`seqLength = ${seqLength}`, tempSeqTimeline);
                                 let validSeqLength = 0;
-                                for (let i = seqLength; i >=3; i--){
+                                for (let i = seqLength; i >= 3; i--) {
                                     const slicedList = tempSeqTimeline.slice(-i);
                                     const slicedSeqLength = slicedList.length;
-                            const chanceSum = slicedList.reduce((acc,cur)=>acc+cur.probability,0);
-                                    if (chanceSum <= 33*slicedSeqLength && last.isValid) {
-                                processedItems[processedItems.length-1].resultClass = 'result-success-low-prob';
-                                processedItems[processedItems.length-1].resultText = '💯'.repeat(slicedSeqLength);
+                                    const chanceSum = slicedList.reduce((acc, cur) => acc + cur.probability, 0);
+                                    if (chanceSum <= 33 * slicedSeqLength && last.isValid) {
+                                        processedItems[processedItems.length - 1].resultClass = 'result-success-low-prob';
+                                        processedItems[processedItems.length - 1].resultText = '💯'.repeat(slicedSeqLength);
                                         break;
-                                } else if (chanceSum >= 66*slicedSeqLength && !last.isValid) {
-                                processedItems[processedItems.length-1].resultClass = 'result-fail-high-prob';
-                                processedItems[processedItems.length-1].resultText = '☠'.repeat(slicedSeqLength);
+                                    } else if (chanceSum >= 66 * slicedSeqLength && !last.isValid) {
+                                        processedItems[processedItems.length - 1].resultClass = 'result-fail-high-prob';
+                                        processedItems[processedItems.length - 1].resultText = '☠'.repeat(slicedSeqLength);
                                         break;
+                                    }
                                 }
-                                }
-                                
+
                             }
 
 
-                        } 
-                    } 
-                            chanceSeqTimeline.push({
+                        }
+                    }
+                    chanceSeqTimeline.push({
                         isValid: isValid,
-                                probability: roundedProbability
-                            });
-                    
-                        
+                        probability: roundedProbability
+                    });
 
-                    
+
+
+
                     processedItems.push({
                         date: dropDate,
                         itemName: dropData.itemName,
@@ -716,7 +743,7 @@ async function getTimelineItemDetails(allItemIds) {
 
 
                 // 🚨 전역 변수에 전체 데이터 저장 🚨
-            allTimelinePages = processedItems;
+                allTimelinePages = processedItems;
                 filterTimeline();
                 // 4. 결과 출력
                 displayResults();
@@ -726,7 +753,7 @@ async function getTimelineItemDetails(allItemIds) {
                 statusEl.textContent = `오류 발생: ${error.message}`;
             } finally {
                 searchBtn.disabled = false;
-             charInput.readonly = false;
+                charInput.readonly = false;
                 if (!statusEl.textContent.startsWith("오류")) {
                     statusEl.textContent = "조회 완료!";
                 }
@@ -768,10 +795,10 @@ async function getTimelineItemDetails(allItemIds) {
 
             const rowCountElement = document.getElementById('totalRowCount'); // 🚨 새로운 요소 가져오기 🚨
             // 3. 총 행 수 업데이트
-    if (rowCountElement) {
-        rowCountElement.textContent = `총 타임라인 수: ${items.length}`;
-    }
-            
+            if (rowCountElement) {
+                rowCountElement.textContent = `총 타임라인 수: ${items.length}`;
+            }
+
         }
 
         // 날짜를 'YYYYMMDD' 형식의 문자열로 변환
@@ -785,67 +812,67 @@ async function getTimelineItemDetails(allItemIds) {
         /**
  * 체크박스 상태에 따라 타임라인 데이터를 필터링하고 노출합니다.
  */
-function filterTimeline() {
-    if (!allTimelinePages || allTimelinePages.length === 0) {
-        return; // 데이터가 없거나 테이블이 준비되지 않았으면 종료
-    }
-    
-    // 1. 체크된 등급(Rarities) 확인
-    const checkedRarities = [];
-    if (document.getElementById('filterTaecho')?.checked) checkedRarities.push('태초');
-    if (document.getElementById('filterEpic')?.checked) checkedRarities.push('에픽');
-    if (document.getElementById('filterLegendary')?.checked) checkedRarities.push('레전더리');
+        function filterTimeline() {
+            if (!allTimelinePages || allTimelinePages.length === 0) {
+                return; // 데이터가 없거나 테이블이 준비되지 않았으면 종료
+            }
 
-    console.log('filterTimeline', checkedRarities);
-    
-    // 체크된 등급이 없으면 모든 데이터를 노출하지 않습니다.
-    if (checkedRarities.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">선택된 아이템 등급이 없습니다.</td></tr>';
-        return;
-    }
+            // 1. 체크된 등급(Rarities) 확인
+            const checkedRarities = [];
+            if (document.getElementById('filterTaecho')?.checked) checkedRarities.push('태초');
+            if (document.getElementById('filterEpic')?.checked) checkedRarities.push('에픽');
+            if (document.getElementById('filterLegendary')?.checked) checkedRarities.push('레전더리');
 
-    // 2. 전체 데이터를 순회하며 필터링
-    filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => [505,507,513].includes(row.code));
+            console.log('filterTimeline', checkedRarities);
 
-    displayResults();
-}
+            // 체크된 등급이 없으면 모든 데이터를 노출하지 않습니다.
+            if (checkedRarities.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">선택된 아이템 등급이 없습니다.</td></tr>';
+                return;
+            }
+
+            // 2. 전체 데이터를 순회하며 필터링
+            filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => [505, 507, 513].includes(row.code));
+
+            displayResults();
+        }
 
         function resetGlobalData() {
- allTimelinePages = [];
- filteredTimelinePages = [];
-        
-        // 🚨 아이템 획득 시점까지의 세트 부위 점유 상태를 추적하는 객체
-// Key: "세트이름-희귀도" (예: "세렌디피티 세트-에픽")
-// Value: Set 객체로, 이미 획득한 슬롯 부위 이름들을 저장합니다.
- setSlotTracker = {};
+            allTimelinePages = [];
+            filteredTimelinePages = [];
+
+            // 🚨 아이템 획득 시점까지의 세트 부위 점유 상태를 추적하는 객체
+            // Key: "세트이름-희귀도" (예: "세렌디피티 세트-에픽")
+            // Value: Set 객체로, 이미 획득한 슬롯 부위 이름들을 저장합니다.
+            setSlotTracker = {};
 
         }
 
         // ------------------------------------------------------------------
-// 🚨 DOM 로드 후 이벤트 리스너 연결 🚨
-document.addEventListener('DOMContentLoaded', (event) => {
-    const inputElement = document.getElementById('characterNameInput');
-    
-    // input 요소가 존재하는지 확인 후 이벤트 리스너 연결
-    if (inputElement) {
-        inputElement.addEventListener('keydown', handleEnterKey);
-    }
-});
+        // 🚨 DOM 로드 후 이벤트 리스너 연결 🚨
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const inputElement = document.getElementById('characterNameInput');
+
+            // input 요소가 존재하는지 확인 후 이벤트 리스너 연결
+            if (inputElement) {
+                inputElement.addEventListener('keydown', handleEnterKey);
+            }
+        });
 
         // 1. 드롭다운 옵션을 생성하고 추가하는 함수
         function populateServerOptions() {
             const selectElement = document.getElementById('serverSelect');
 
-            serverData.forEach((server,index) => {
+            serverData.forEach((server, index) => {
                 const option = document.createElement('option');
                 option.value = server.serverId; // option의 value에 serverId 저장
                 option.textContent = server.serverName; // 사용자에게 보이는 텍스트
-            
-            // 첫 번째 항목(index === 0)을 기본 선택값으로 지정
+
+                // 첫 번째 항목(index === 0)을 기본 선택값으로 지정
                 if (index === 0) {
                     option.selected = true;
                 }
-                
+
                 selectElement.appendChild(option);
             });
         }
@@ -853,8 +880,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
         // 2. 선택된 값을 전역 변수에 저장하고 화면에 표시하는 함수
         function saveSelectedServerId(serverId) {
             // 전역 변수에 값 저장
-            SERVER_ID = serverId; 
-            
+            SERVER_ID = serverId;
+
             // 값이 저장되었는지 확인용 (선택 사항)
             console.log("선택된 서버 ID:", selectedServerId);
 
@@ -867,64 +894,5 @@ document.addEventListener('DOMContentLoaded', (event) => {
     </script>
 
 </body>
+
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
