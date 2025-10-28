@@ -1382,7 +1382,7 @@
 
                     const result = { ...itemObject, [itemData.itemKey]: itemData };
 
-                    const putReq = store.put(DEFAULT_ID);
+                    const putReq = store.put(result, DEFAULT_ID);
 
                     putReq.onsuccess = (event) => {
                         resolve(event.target.result);
