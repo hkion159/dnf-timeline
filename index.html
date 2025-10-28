@@ -718,7 +718,8 @@
                     }
                     chanceSeqTimeline.push({
                         isValid: isValid,
-                        probability: roundedProbability
+                        probability: roundedProbability,
+                        itemName: dropData.itemName
                     });
 
 
@@ -823,8 +824,6 @@
             if (document.getElementById('filterEpic')?.checked) checkedRarities.push('에픽');
             if (document.getElementById('filterLegendary')?.checked) checkedRarities.push('레전더리');
 
-            console.log('filterTimeline', checkedRarities);
-
             // 체크된 등급이 없으면 모든 데이터를 노출하지 않습니다.
             if (checkedRarities.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">선택된 아이템 등급이 없습니다.</td></tr>';
@@ -846,6 +845,7 @@
             // Value: Set 객체로, 이미 획득한 슬롯 부위 이름들을 저장합니다.
             setSlotTracker = {};
 
+            chanceSeqTimeline = [];
         }
 
         // ------------------------------------------------------------------
@@ -881,9 +881,6 @@
         function saveSelectedServerId(serverId) {
             // 전역 변수에 값 저장
             SERVER_ID = serverId;
-
-            // 값이 저장되었는지 확인용 (선택 사항)
-            console.log("선택된 서버 ID:", selectedServerId);
 
             // 화면에 표시
             document.getElementById('displaySelectedId').textContent = selectedServerId;
