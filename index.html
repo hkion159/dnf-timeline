@@ -692,7 +692,6 @@
                             // 3. 응답 데이터를 파싱하여 캐시에 저장
                             if (data.rows) {
                                 for (const itemData of data.rows) {
-                                    const itemId = itemData.itemId;
                                     setItemDetail(itemData);
                                 }
                             }
@@ -1380,7 +1379,7 @@
                 getReq.onsuccess = (event) => {
                     const itemObject = event.target.result || {};
 
-                    const result = { ...itemObject, [itemData.itemKey]: itemData };
+                    const result = { ...itemObject, [itemData.itemId]: itemData };
 
                     const putReq = store.put(result, DEFAULT_ID);
 
