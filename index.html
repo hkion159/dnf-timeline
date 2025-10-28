@@ -1164,7 +1164,7 @@
         }
 
         function deleteCharacter(serverName, nickname) {
-            const transaction = db.transaction([CHARACTER_STORE], 'readonly');
+            const transaction = db.transaction([CHARACTER_STORE], 'readwrite');
             const store = transaction.objectStore(CHARACTER_STORE);
 
             const getReq = store.get(1);
