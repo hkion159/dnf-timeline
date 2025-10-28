@@ -689,7 +689,6 @@
                         const last = chanceSeqTimeline[seqLength - 1];
 
                         if (isValid !== last.isValid) {
-                            console.log('changed', 'last', last, 'now', isValid, dropData.itemName);
                             const tempSeqTimeline = [...chanceSeqTimeline];
 
                             // 연속 정보 초기화
@@ -697,7 +696,6 @@
 
                             // 마지막 아이템에 결과 추가
                             if (seqLength >= 3) {
-                                console.log(`seqLength = ${seqLength}`, tempSeqTimeline);
                                 let validSeqLength = 0;
                                 for (let i = seqLength; i >= 3; i--) {
                                     const slicedList = tempSeqTimeline.slice(-i);
@@ -720,6 +718,7 @@
                         }
                     }
                     if (isValidCode(code)) {
+                        console.log(dropData.itemName, code);
                         chanceSeqTimeline.push({
                             isValid: isValid,
                             probability: roundedProbability,
