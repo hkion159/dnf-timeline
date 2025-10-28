@@ -1147,7 +1147,6 @@
          * 개별 닉네임 태그 (HTML 요소)를 생성합니다.
          */
         function createNicknameTag(serverName, nickname) {
-            console.log(serverName, nickname);
             const tagDiv = document.createElement('div');
             tagDiv.className = 'nickname-tag';
 
@@ -1169,7 +1168,7 @@
             // 삭제 이벤트 리스너 추가
             removeBtn.addEventListener('click', (event) => {
                 // IndexedDB 삭제 로직 (별도의 함수 필요)
-                console.log(`[${serverName}] ${nickname} (ID: ${id}) 삭제 요청`);
+                console.log(`[${serverName}] ${nickname} 삭제 요청`);
                 deleteCharacter(serverName, nickname);
                 tagDiv.remove(); // DOM에서도 즉시 제거
             });
