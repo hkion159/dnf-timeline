@@ -480,9 +480,9 @@
                             const store = transaction.objectStore(CHARACTER_STORE);
                             const getReq = store.get(1);
                             getReq.onsuccess = (event) => {
-                                const characterObject = event.target.result;
+                                const characterObject = event.target.result || {};
                                 const serverObject = characterObject[SERVER_ID] || {};
-                                const putReq = store.put({ [SERVER_ID]: { ...serverObject, [character.characterName]: character.characterId } });
+                                const putReq = store.put({ ...characterObject, [SERVER_ID]: { ...serverObject, [character.characterName]: character.characterId } });
                                 putReq.onsuccess = (event) => {
                                     resolve(character.characterId);
                                 };
