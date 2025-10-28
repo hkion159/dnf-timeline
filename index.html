@@ -675,7 +675,7 @@
                 statusEl.textContent = "캐릭터 ID 조회 중...";
                 const characterId = await getCharacterId(characterName);
                 const el = document.getElementById('infoNotice');
-                el.style.background = `url('https://img-api.neople.co.kr/df/servers/${serverId}/characters/${characterId}?zoom=1') no-repeat center`
+                el.style.background = `url('https://img-api.neople.co.kr/df/servers/${SERVER_ID}/characters/${characterId}?zoom=1') no-repeat center`
 
                 loadAndDisplayTags();
                 resetGlobalData();
