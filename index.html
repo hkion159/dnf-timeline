@@ -741,10 +741,8 @@
                 loadAndDisplayTags();
                 resetGlobalData();
 
-                const set = await getCharacterEquipment(characterId);
-
                 // 2. 모든 타임라인 데이터 가져오기 (월별)
-                const allTimelineRows = await getAllTimelinePages(characterId);
+                const [set, allTimelineRows] = await Promise.all(getCharacterEquipment, getAllTimelinePages(characterId));
 
                 if (allTimelineRows.length === 0) {
                     statusEl.textContent = "조회 기간 내 아이템 획득 기록이 없습니다.";
