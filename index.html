@@ -835,7 +835,7 @@
             }
 
             // 2. 전체 데이터를 순회하며 필터링
-            filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => isValidCode(code));
+            filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => isValidCode(row.code));
 
             displayResults();
         }
