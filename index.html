@@ -650,7 +650,8 @@
             // 수집된 모든 아이템 ID에 대해 다중 조회 함수 호출
             await getTimelineItemDetails(allItemIds);
 
-            setTimelines([...timelines, ...allTimelineRows]);
+            await setTimelines([...timelines, ...allTimelineRows]);
+            
             return allTimelineRows;
         }
 
