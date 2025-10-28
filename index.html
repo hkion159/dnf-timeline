@@ -598,6 +598,8 @@
             const lastTimeline = timelines[timelines.length - 1];
             if (lastTimeline) {
                 start = new Date(lastTimeline.date);
+                const startMinute = start.getMinutes();
+                start.setMinutes(startMinute + 1);
             }
             const today = new Date();
 
