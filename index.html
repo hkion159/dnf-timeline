@@ -593,20 +593,25 @@
         async function getAllTimelinePages(characterId) {
             let allTimelineRows = [];
             let currentMonthStart = new Date('2025-01-01');
+            let start = new Date('2025-01-01');
+            const timelines = await getTimelines(characterId);
+            const lastTimeline = timelines[timelines.length - 1];
+            if (lastTimeline) {
+                start = new Date(lastTimeline.date);
+            }
             const today = new Date();
 
-            while (currentMonthStart < today) {
+            while (start < today) {
                 // 다음 달 1일 계산
-                let nextMonthStart = new Date(currentMonthStart.getFullYear(), currentMonthStart.getMonth() + 1, 1);
+                let nextMonthStart = new Date(start.getFullYear(), start.getMonth() + 1, 1);
                 if (nextMonthStart > today) {
                     nextMonthStart = today;
                 }
 
-                // 날짜 포맷팅 (YYYYMMDD)
-                const startDateStr = formatDate(currentMonthStart);
+                const startDateStr = formatDate(start) + formatToApiTime(start);
                 const endDateStr = nextMonthStart === today ? formatDate(nextMonthStart) + formatToApiTime(nextMonthStart) : formatDate(nextMonthStart);
 
-                statusEl.textContent = `${currentMonthStart.getFullYear()}년 ${currentMonthStart.getMonth() + 1}월 타임라인 조회 중...`;
+                statusEl.textContent = `${start.getFullYear()}년 ${start.getMonth() + 1}월 타임라인 조회 중...`;
 
                 const url = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters/${characterId}/timeline?limit=100&code=505,507,513,504,511,516,514&startDate=${startDateStr}&endDate=${endDateStr}`;
 
@@ -630,7 +635,7 @@
                 }
 
                 // 다음 달로 이동
-                currentMonthStart = nextMonthStart;
+                start = nextMonthStart;
             }
 
             const allItemIds = [];
@@ -644,6 +649,8 @@
 
             // 수집된 모든 아이템 ID에 대해 다중 조회 함수 호출
             await getTimelineItemDetails(allItemIds);
+
+            setTimelines([...timelines, ...allTimelineRows]);
             return allTimelineRows;
         }
 
@@ -654,7 +661,6 @@
             return `T${hh}${mm}`;
         }
 
-        // 기존: getItemDetails(itemId)를 대체하는 함수
         // 타임라인에서 필요한 모든 아이템 ID 목록을 받아 정보를 조회하고 캐시에 저장합니다.
         async function getTimelineItemDetails(allItemIds) {
             const uniqueItemIds = Array.from(new Set(allItemIds));
@@ -1413,6 +1419,55 @@
 
             // 2. 배열 A를 순회하며 Set B에 없는 원소만 필터링합니다.
             return arrA.filter(item => !setB.has(item));
+        }
+
+        function getTimelines(characterId) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([TIMELINE_STORE], 'readonly');
+                const store = transaction.objectStore(TIMELINE_STORE);
+
+                const getReq = store.get(DEFAULT_ID);
+
+                getReq.onsuccess = (event) => {
+                    const timelineObject = event.target.result || {};
+
+                    const timelines = timelineObject[characterId];
+                    if (timelines) {
+                        resolve(timelines);
+                    } else {
+                        reject('empty timelines');
+                    }
+                }
+
+                getReq.onerror = (event) => {
+                    console.error(`타임라인 조회 실패`, event);
+                    reject(`타임라인 조회 실패`, event.target.error)
+                };
+            });
+        }
+
+        function setTimelines(characterId, timelines) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([TIMELINE_STORE], 'readonly');
+                const store = transaction.objectStore(TIMELINE_STORE);
+
+                const getReq = store.get(DEFAULT_ID);
+
+                getReq.onsuccess = (event) => {
+                    const timelineObject = event.target.result || {};
+
+                    const putReq = store.put({ ...timelineObject, [characterId]: timelines }, DEFAULT_ID);
+
+                    putReq.onsuccess = (event) => {
+                        resolve(event.target.result);
+                    }
+                }
+
+                getReq.onerror = (event) => {
+                    console.error(`타임라인 조회 실패`, event);
+                    reject(`타임라인 조회 실패`, event.target.error)
+                };
+            });
         }
     </script>
 
