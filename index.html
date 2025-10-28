@@ -772,7 +772,7 @@
         function displayResults() {
             const items = filteredTimelinePages;
             // 최신순(내림차순)으로 정렬하여 표시
-            items.sort((a, b) => new Date(b.date) - new Date(a.date));
+            // items.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             if (items.length === 0) {
                 resultsEl.innerHTML = '<tr><td colspan="6">표시할 115레벨 세트 아이템이 없습니다.</td></tr>';
