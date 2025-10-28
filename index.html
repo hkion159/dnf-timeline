@@ -953,11 +953,11 @@
                                     const slicedList = tempSeqTimeline.slice(-i);
                                     const slicedSeqLength = slicedList.length;
                                     const chanceSum = slicedList.reduce((acc, cur) => acc + cur.probability, 0);
-                                    if (chanceSum <= 33 * slicedSeqLength && last.isValid) {
+                                    if (chanceSum <= 40 * slicedSeqLength && last.isValid) {
                                         processedItems[processedItems.length - 1].resultClass = 'result-success-low-prob';
                                         processedItems[processedItems.length - 1].resultText = '💯'.repeat(slicedSeqLength);
                                         break;
-                                    } else if (chanceSum >= 66 * slicedSeqLength && !last.isValid) {
+                                    } else if (chanceSum >= 60 * slicedSeqLength && !last.isValid) {
                                         processedItems[processedItems.length - 1].resultClass = 'result-fail-high-prob';
                                         processedItems[processedItems.length - 1].resultText = '☠'.repeat(slicedSeqLength);
                                         break;
