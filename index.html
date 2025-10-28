@@ -1096,6 +1096,8 @@
                 // (getCharacters 함수가 Promise를 반환하므로 await 사용 가능)
                 const characterList = await getCharacters();
 
+                console.log('characterList', characterList);
+
                 // 3. 조회된 데이터를 순회하며 태그 생성
                 characterList.forEach(charactersObject => {
                     Object.entries((serverName, nickname) => {
