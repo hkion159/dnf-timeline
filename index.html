@@ -281,6 +281,8 @@
 
         const VALID_SLOTS = ['상의', '머리어깨', '하의', '벨트', '신발', '팔찌', '목걸이', '반지', '보조장비', '마법석', '귀걸이'];
 
+        const VALID_CODES = [505, 507, 513];
+
         // --- 설정 및 상수 ---
         // *** 프록시 서버의 기본 경로를 정의합니다. ***
         // Vercel에 배포된 경우, /api/proxy는 api/proxy.js 서버리스 함수로 연결됩니다.
@@ -716,11 +718,13 @@
 
                         }
                     }
-                    chanceSeqTimeline.push({
-                        isValid: isValid,
-                        probability: roundedProbability,
-                        itemName: dropData.itemName
-                    });
+                    if (isValidCode(code)) {
+                        chanceSeqTimeline.push({
+                            isValid: isValid,
+                            probability: roundedProbability,
+                            itemName: dropData.itemName
+                        });
+                    }
 
 
 
@@ -831,7 +835,7 @@
             }
 
             // 2. 전체 데이터를 순회하며 필터링
-            filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => [505, 507, 513].includes(row.code));
+            filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => isValidCode(code));
 
             displayResults();
         }
@@ -888,6 +892,10 @@
 
         // 페이지 로드 시 옵션 생성 함수 실행
         document.addEventListener('DOMContentLoaded', populateServerOptions);
+
+        function isValidCode(code) {
+            return VALID_CODES.includes(code);
+        }
     </script>
 
 </body>
