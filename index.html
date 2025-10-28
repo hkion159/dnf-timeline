@@ -1013,7 +1013,7 @@
             const items = filteredTimelinePages;
             // 최신순(내림차순)으로 정렬하여 표시
             // items.sort((a, b) => new Date(b.date) - new Date(a.date));
-            if (!items[0].date) console.log(items);
+            if (!(items[0])) console.log(items);
             if (items[0].date < items[items.length - 1].date) { items.reverse(); }
 
             if (items.length === 0) {
