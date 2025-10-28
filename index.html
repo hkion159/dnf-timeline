@@ -417,6 +417,7 @@
         const CHARACTER_STORE = 'characters';
         const ITEM_STORE = 'items';
         const TIMELINE_STORE = 'timelines';
+        const DEFAULT_ID = 1;
 
         /**
  * 캐릭터명 입력창에서 Enter 키를 눌렀을 때 startSearch() 함수를 호출합니다.
@@ -437,7 +438,7 @@
             return new Promise((resolve, reject) => {
                 const transaction = db.transaction([CHARACTER_STORE], 'readwrite');
                 const store = transaction.objectStore(CHARACTER_STORE);
-                const getRequest = store.get(1);
+                const getRequest = store.get(DEFAULT_ID);
                 getRequest.onsuccess = (event) => {
                     const characterObject = event.target.result;
 
@@ -446,7 +447,7 @@
                     if (characterObject) {
                         const serverObject = characterObject[SERVER_ID];
                         if (!serverObject) {
-                            store.put({ ...characterObject, [SERVER_ID]: {} });
+                            store.put({ ...characterObject, [SERVER_ID]: {} }, DEFAULT_ID);
                         } else {
                             const characterId = serverObject[characterName];
                             if (!characterId) {
@@ -478,11 +479,11 @@
                             const character = data.rows[0];
                             const transaction = db.transaction([CHARACTER_STORE], 'readwrite');
                             const store = transaction.objectStore(CHARACTER_STORE);
-                            const getReq = store.get(1);
+                            const getReq = store.get(DEFAULT_ID);
                             getReq.onsuccess = (event) => {
                                 const characterObject = event.target.result || {};
                                 const serverObject = characterObject[SERVER_ID] || {};
-                                const putReq = store.put({ ...characterObject, [SERVER_ID]: { ...serverObject, [character.characterName]: character.characterId } });
+                                const putReq = store.put({ ...characterObject, [SERVER_ID]: { ...serverObject, [character.characterName]: character.characterId } }, DEFAULT_ID);
                                 putReq.onsuccess = (event) => {
                                     resolve(character.characterId);
                                 };
@@ -1231,7 +1232,7 @@
             const transaction = db.transaction([CHARACTER_STORE], 'readwrite');
             const store = transaction.objectStore(CHARACTER_STORE);
 
-            const getReq = store.get(1);
+            const getReq = store.get(DEFAULT_ID);
 
             getReq.onsuccess = (event) => {
                 const characterObject = event.target.result;
@@ -1239,7 +1240,7 @@
                 const character = characterObject[serverName][nickname];
                 if (character) {
                     delete characterObject[serverName][nickname];
-                    store.put(character);
+                    store.put(character, DEFAULT_ID);
                 }
             }
 
