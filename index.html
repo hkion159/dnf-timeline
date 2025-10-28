@@ -783,7 +783,6 @@
                     const code = itemDrop.code;
 
                     // 3-1. 아이템 상세 정보 조회
-                    // const details = itemDetailsCache[itemId];
                     const details = getItemDetail(itemId);
 
                     // 3-2. 유효성 검사: 115레벨이 아니거나, 세트 아이템이 아니면 무시
@@ -1014,6 +1013,7 @@
             const items = filteredTimelinePages;
             // 최신순(내림차순)으로 정렬하여 표시
             // items.sort((a, b) => new Date(b.date) - new Date(a.date));
+            if (!items[0].date) console.log(items);
             if (items[0].date < items[items.length - 1].date) { items.reverse(); }
 
             if (items.length === 0) {
