@@ -172,6 +172,86 @@
             /* 연한 노란색 */
             font-weight: bold;
         }
+
+        /* 1. 컨테이너 설정: 가로로 나열 및 자동 줄 바꿈 */
+        .search-history-container {
+            /* Flexbox를 사용하여 내부 요소를 가로로 나열 */
+            display: flex;
+            /* 핵심: 가로 공간이 부족할 때 다음 줄로 자동 줄 바꿈 */
+            flex-wrap: wrap;
+
+            /* 요소들 사이에 약간의 간격 확보 */
+            gap: 8px;
+            /* 태그 간의 가로/세로 간격 설정 */
+
+            /* 선택 사항: 컨테이너의 최대 너비 설정 (페이지 전체 너비를 사용하지 않도록) */
+            /* max-width: 800px; 
+    margin: 0 auto; */
+
+            padding: 10px 0;
+        }
+
+        /* 2. 개별 닉네임 태그 스타일: 작은 크기, 세로 고정 */
+        .nickname-tag {
+            /* Flex Item으로 설정 */
+            display: inline-flex;
+            /* 세로 크기를 고정하고 내용을 가운데 정렬 */
+            height: 28px;
+            align-items: center;
+
+            /* 가로는 내용(텍스트 + 버튼)을 감싸도록 설정 (width 지정 안 함) */
+
+            /* 디자인 스타일 */
+            background-color: #f0f0f0;
+            /* 배경색 */
+            border-radius: 14px;
+            /* 둥근 모양 */
+            padding: 0 5px 0 10px;
+            /* 좌우 패딩으로 가로 크기 확보 */
+            font-size: 13px;
+            /* 작은 글꼴 크기 */
+            color: #333;
+
+            /* 줄 바꿈을 막아 태그가 한 줄에 나오도록 */
+            white-space: nowrap;
+            /* 상단 여백 설정 (자동 줄 바꿈 시 보기 좋게) */
+            margin-bottom: 5px;
+        }
+
+        /* 3. 닉네임 텍스트 */
+        .nickname-text {
+            /* 텍스트와 버튼 사이에 약간의 간격 추가 */
+            margin-right: 5px;
+        }
+
+        /* 4. 삭제 버튼 (x 버튼): 가장 작은 크기 */
+        .remove-btn {
+            /* 크기 및 모양 설정 */
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            /* 원형 */
+            border: none;
+            background-color: #ccc;
+            color: white;
+            font-size: 10px;
+            /* 매우 작은 폰트 */
+            font-weight: bold;
+            cursor: pointer;
+
+            /* 버튼 내부 텍스트 가운데 정렬 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            /* 호버 효과 */
+            transition: background-color 0.2s;
+        }
+
+        .remove-btn:hover {
+            background-color: #e00;
+            /* 마우스 오버 시 빨간색 */
+        }
     </style>
 </head>
 
@@ -179,6 +259,28 @@
 
     <div class="container">
         <h1>던파 득템 유효성 검사기</h1>
+        <div id="search-history-container" class="search-history-container">
+            <div class="nickname-tag">
+                <span class="nickname-text">캐릭터닉네임A</span>
+                <button class="remove-btn">x</button>
+            </div>
+            <div class="nickname-tag">
+                <span class="nickname-text">닉네임B</span>
+                <button class="remove-btn">x</button>
+            </div>
+            <div class="nickname-tag">
+                <span class="nickname-text">ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ</span>
+                <button class="remove-btn">x</button>
+            </div>
+            <div class="nickname-tag">
+                <span class="nickname-text">ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ</span>
+                <button class="remove-btn">x</button>
+            </div>
+            <div class="nickname-tag">
+                <span class="nickname-text">ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ</span>
+                <button class="remove-btn">x</button>
+            </div>
+        </div>
         <div class="input-area">
             <select id="serverSelect" onchange="saveSelectedServerId(this.value)">
             </select>
@@ -209,7 +311,6 @@
                 <li>항아리, 업그레이드, 초월 등은 <b>제외</b>입니다. (확률 계산엔 포함시킴) (랜덤 드랍만 보여줌)<br /></li>
                 <li>'유효 확률'은 해당 아이템을 획득할 <b>당시</b>를 기준으로 그 세트의 유효 <b>부위</b> 확률입니다. <br /></li>
                 <li>운은 먹었을 때의 결과운을 의미합니다. 많거나 적게 뜬다는 의미가 아닙니다. <br /></li>
-                <li>재미로 만든거라 DB 는 안 붙여서 매번 다시 조회해서 비효율적입니다.</li>
             </ul>
             </p>
         </div>
@@ -303,6 +404,14 @@
         const statusEl = document.getElementById('status');
         const resultsEl = document.getElementById('resultsContainer');
 
+        // DB 연결 객체를 저장할 변수 (전역적으로 사용)
+        let db;
+        const DB_NAME = 'dnfTimeline';
+        const DB_VERSION = 1;
+        const CHARACTER_STORE = 'characters';
+        const ITEM_STORE = 'items';
+        const TIMELINE_STORE = 'timelines';
+
         /**
  * 캐릭터명 입력창에서 Enter 키를 눌렀을 때 startSearch() 함수를 호출합니다.
  * @param {Event} event - 키보드 이벤트 객체
@@ -318,13 +427,46 @@
         // --- API 호출 함수 ---
 
         // 1. 캐릭터 ID 조회
-        async function getCharacterId(characterName) {
-            const url = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters?characterName=${encodeURIComponent(characterName)}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error("캐릭터 ID 조회 실패");
-            const data = await response.json();
-            if (!data.rows || data.rows.length === 0) throw new Error("캐릭터를 찾을 수 없습니다.");
-            return data.rows[0].characterId;
+        function getCharacterId(characterName) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([CHARACTER_STORE], 'readwrite');
+                const store = transaction.objectStore(CHARACTER_STORE);
+                const getRequest = store.get(1);
+                getRequest.onsuccess = (event) => {
+                    const characterObject = event.target.result;
+
+                    if (characterObject) {
+                        const serverObject = characterObject[SERVER_ID];
+                        if (!serverObject) {
+                            store.put({ ...characterObject, [SERVER_ID]: {} });
+                        } else {
+                            const characterId = serverObject[characterName];
+                            resolve(characterId);
+                        }
+                    } else {
+                        console.log(`characters를 찾을 수 없습니다.`);
+                        resolve(getCharacterIdApi());
+                    }
+                };
+
+                getRequest.onerror = (event) => {
+                    console.error("데이터 조회 오류:", event.target.error);
+                    resolve(getCharacterIdApi());
+                };
+
+
+                async function getCharacterIdApi() {
+                    const url = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters?characterName=${encodeURIComponent(characterName)}`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error("캐릭터 ID 조회 실패");
+                    const data = await response.json();
+                    if (!data.rows || data.rows.length === 0) throw new Error("캐릭터를 찾을 수 없습니다.");
+                    const character = data.rows[0];
+                    store.put({ [SERVER_ID]: { [character.characterName]: character.characterId } });
+                    return character.characterId;
+                }
+
+            });
         }
 
         // 1.5. 캐릭터 set 조회
@@ -897,6 +1039,115 @@
         function isValidCode(code) {
             return VALID_CODES.includes(code);
         }
+
+
+
+
+
+
+
+        /**
+         * 1. DB 연결 시도 (최초 1회 실행)
+         */
+        function openDatabase() {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+            // DB 버전 업그레이드 또는 최초 생성 시 실행됨
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+
+                // 객체 저장소(테이블) 생성
+                if (!db.objectStoreNames.contains(CHARACTER_STORE)) {
+                    db.createObjectStore(CHARACTER_STORE, { autoIncrement: true });
+                }
+                if (!db.objectStoreNames.contains(ITEM_STORE)) {
+                    db.createObjectStore(ITEM_STORE, { autoIncrement: true });
+                }
+                if (!db.objectStoreNames.contains(TIMELINE_STORE)) {
+                    db.createObjectStore(TIMELINE_STORE, { autoIncrement: true });
+                }
+                console.log('데이터베이스 구조 설정 완료.');
+            };
+
+            // DB 연결 성공 시 실행됨
+            request.onsuccess = (event) => {
+                db = event.target.result; // 전역 변수에 DB 객체 저장
+                console.log('IndexedDB 연결 성공.');
+
+                // 연결 후 데이터 작업을 시작합니다.
+                // addDataAndRead();
+            };
+
+            // DB 연결 실패 시 실행됨
+            request.onerror = (event) => {
+                console.error('IndexedDB 연결 오류:', event.target.error);
+            };
+        }
+
+        /**
+         * 2. 데이터 추가 및 읽기 (트랜잭션 사용)
+         */
+        function addDataAndRead() {
+            if (!db) {
+                console.error('DB가 연결되지 않았습니다.');
+                return;
+            }
+
+            // 'readwrite' 모드로 트랜잭션 시작
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+
+            // 1. 데이터 추가 작업
+            const item1 = { name: '노트북', price: 1500000 };
+            const item2 = { name: '키보드', price: 80000 };
+
+            store.add(item1);
+            store.add(item2);
+
+            transaction.oncomplete = () => {
+                console.log('데이터 추가 트랜잭션 완료.');
+                // 2. 추가된 데이터 읽기 작업을 시작합니다.
+                readAllData();
+            };
+
+            transaction.onerror = (event) => {
+                console.error('데이터 추가 트랜잭션 오류:', event.target.error);
+            };
+        }
+
+        /**
+         * 3. 모든 데이터 읽기 (커서 사용)
+         */
+        function readAllData() {
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+
+            // 모든 데이터를 순회하기 위한 커서 요청
+            const request = store.openCursor();
+
+            let dataList = [];
+
+            request.onsuccess = (event) => {
+                const cursor = event.target.result;
+
+                if (cursor) {
+                    // 커서가 있으면 데이터를 배열에 추가
+                    dataList.push(cursor.value);
+                    // 다음 데이터로 이동
+                    cursor.continue();
+                } else {
+                    // 더 이상 데이터가 없으면 완료
+                    console.log('모든 데이터 읽기 완료:', dataList);
+                }
+            };
+
+            request.onerror = (event) => {
+                console.error('데이터 읽기 오류:', event.target.error);
+            };
+        }
+
+        // 페이지 로드 시 DB 연결 시작
+        openDatabase();
     </script>
 
 </body>
