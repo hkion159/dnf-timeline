@@ -689,12 +689,14 @@
                             return response.json();
                         })
                         .then(data => {
-                            // 3. 응답 데이터를 파싱하여 캐시에 저장
+                            const works = [];
+                            // 3. 응답 데이터를 파싱하여 db에 저장
                             if (data.rows) {
                                 for (const itemData of data.rows) {
-                                    setItemDetail(itemData);
+                                    works.push(setItemDetail(itemData));
                                 }
                             }
+                            return Promise.all(works);
                         })
                         .catch(error => {
                             console.error(`아이템 묶음 조회 중 오류 발생: ${error.message}`);
@@ -1013,7 +1015,6 @@
             const items = filteredTimelinePages;
             // 최신순(내림차순)으로 정렬하여 표시
             // items.sort((a, b) => new Date(b.date) - new Date(a.date));
-            if (!(items[0])) console.log(items);
             if (items[0].date < items[items.length - 1].date) { items.reverse(); }
 
             if (items.length === 0) {
