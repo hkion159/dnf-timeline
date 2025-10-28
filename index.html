@@ -197,6 +197,34 @@
 
             white-space: nowrap;
             margin-bottom: 5px;
+
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            /* 부드러운 전환 효과 추가 */
+        }
+
+        /* 마우스 오버(Hover) 시: 클릭할 수 있음을 명확히 보여줌 */
+        .nickname-tag:hover {
+            background-color: #e8e8e8;
+            /* 배경색을 약간 어둡게 변경 */
+            /* 또는 미묘한 그림자 효과 추가 */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 클릭 직후(Active) 시: 클릭됨을 강조 */
+        .nickname-tag:active {
+            background-color: #ccc;
+            /* 클릭 시 더 어둡게 */
+            transform: translateY(1px);
+            /* 살짝 눌리는 듯한 효과 */
+        }
+
+        /* 키보드 포커스 시: 키보드 접근성 사용자에게도 시각적 힌트 제공 */
+        .nickname-tag:focus {
+            /* 기본 브라우저 아웃라인 제거 (선택 사항) */
+            outline: none;
+            /* 명확한 포커스 표시 (예: 파란색 테두리) */
+            border: 1px solid #007bff;
         }
 
         /* 3. 서버 이름 스타일 (새로 추가) */
@@ -636,7 +664,7 @@
                 statusEl.textContent = "캐릭터 ID 조회 중...";
                 const characterId = await getCharacterId(characterName);
                 const el = document.getElementById('infoNotice');
-                el.style.background = `url('https://img-api.neople.co.kr/df/servers/${SERVER_ID}/characters/${characterId}?zoom=1') no-repeat center`
+                el.style.background = `url('https://img-api.neople.co.kr/df/servers/${serverId}/characters/${characterId}?zoom=1') no-repeat center`
 
                 loadAndDisplayTags();
                 resetGlobalData();
@@ -1167,6 +1195,7 @@
 
             // 삭제 이벤트 리스너 추가
             removeBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
                 // IndexedDB 삭제 로직 (별도의 함수 필요)
                 console.log(`[${serverName}] ${nickname} 삭제 요청`);
                 deleteCharacter(serverName, nickname);
@@ -1176,8 +1205,15 @@
             tagDiv.appendChild(serverSpan);
             tagDiv.appendChild(nicknameSpan);
             tagDiv.appendChild(removeBtn);
+            tagDiv.onclick=()=>handleTagClick(serverName, nickname)
 
             return tagDiv;
+        }
+
+        function handleTagClick(serverName, nickname) {
+            SERVER_ID = serverData.find((server)=>server.serverName === serverName).serverId;
+            charInput.value = nickname;
+            startSearch();
         }
 
         function deleteCharacter(serverName, nickname) {
