@@ -440,6 +440,8 @@
                     const data = await response.json();
                     if (!data.rows || data.rows.length === 0) throw new Error("캐릭터를 찾을 수 없습니다.");
                     const character = data.rows[0];
+                    const transaction = db.transaction([CHARACTER_STORE], 'readwrite');
+                    const store = transaction.objectStore(CHARACTER_STORE);
                     store.put({ [SERVER_ID]: { [character.characterName]: character.characterId } });
                     return character.characterId;
                 }
