@@ -273,6 +273,68 @@
         .remove-btn:hover {
             background-color: #e00;
         }
+
+        .custom-select {
+            /* 1. 기본 브라우저 스타일 제거 */
+            -webkit-appearance: none;
+            /* Chrome, Safari */
+            -moz-appearance: none;
+            /* Firefox */
+            appearance: none;
+            /* 표준 속성 */
+
+            /* IE 10/11의 기본 X 버튼 숨기기 (필요하다면) */
+            /* IE는 표준 appearance: none;으로는 완벽히 제거되지 않을 수 있습니다. */
+            /* select::-ms-expand { display: none; } */
+
+            /* 2. 크기 및 패딩 설정 */
+            padding: 8px 30px 8px 10px;
+            /* 오른쪽 패딩을 넓혀 커스텀 화살표 공간 확보 */
+            font-size: 16px;
+            line-height: 1.5;
+            height: 40px;
+            /* 높이 고정 */
+
+            /* 3. 디자인 */
+            background-color: #f8f8f8;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            /* 둥근 모서리 */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            /* 은은한 그림자 */
+
+            /* 포커스 시 스타일 */
+            transition: border-color 0.2s, box-shadow 0.2s;
+
+            /* 5. 커스텀 화살표 추가 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23333' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+
+            background-repeat: no-repeat;
+            /* 화살표 위치 조정 (오른쪽에서 10px, 중앙 수직) */
+            background-position: right 10px center;
+            background-size: 12px;
+            /* 화살표 크기 */
+
+            /* (선택 사항) IE 10/11의 화살표 제거 */
+            /* select::-ms-expand { display: none; } */
+        }
+
+        .custom-select:focus {
+            border-color: #007bff;
+            /* 포커스 시 파란색 테두리 */
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            outline: none;
+            /* 기본 포커스 아웃라인 제거 */
+        }
+
+        /* 4. Option 요소 스타일링 (제한적) */
+        /* option 요소 자체는 브라우저가 제공하는 드롭다운 목록에서 렌더링되므로, 
+   CSS 스타일링이 매우 제한적입니다 (주로 색상/배경색 정도만 가능). */
+        .custom-select option {
+            background-color: white;
+            color: #333;
+        }
     </style>
 </head>
 
@@ -288,7 +350,7 @@
             </div>
         </div>
         <div class="input-area">
-            <select id="serverSelect" onchange="saveSelectedServerId(this.value)">
+            <select id="serverSelect" onchange="saveSelectedServerId(this.value)" class="custom-select">
             </select>
             <input type="text" id="characterNameInput" placeholder="캐릭터명을 입력하세요">
             <button id="searchButton" onclick="startSearch()">조회</button>
