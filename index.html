@@ -689,7 +689,7 @@
                         const last = chanceSeqTimeline[seqLength - 1];
 
                         if (isValid !== last.isValid) {
-                            console.log('changed', 'last',last,'now',isValid, dropData.itemName);
+                            console.log('changed', 'last', last, 'now', isValid, dropData.itemName);
                             const tempSeqTimeline = [...chanceSeqTimeline];
 
                             // 연속 정보 초기화
@@ -773,7 +773,7 @@
             const items = filteredTimelinePages;
             // 최신순(내림차순)으로 정렬하여 표시
             // items.sort((a, b) => new Date(b.date) - new Date(a.date));
-            // items.reverse();
+            if (item[0].date < item[item.length - 1].date) { items.reverse(); }
 
             if (items.length === 0) {
                 resultsEl.innerHTML = '<tr><td colspan="6">표시할 115레벨 세트 아이템이 없습니다.</td></tr>';
