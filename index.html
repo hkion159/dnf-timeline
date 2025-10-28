@@ -977,10 +977,6 @@
                         });
                     }
 
-                    if (new Date(dropDate).getMonth() !== new Date(processedItems[processedItems.length - 1]).getMonth()) {
-                        setClass += 'group-divider';
-                    }
-
 
                     processedItems.push({
                         date: dropDate,
@@ -1033,12 +1029,19 @@
             }
 
             let html = "";
-            for (const item of items) {
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                const prevItem = items[Math.max(i-1,0)];
                 const validityClass = item.isValid ? 'valid-true' : 'valid-false';
                 const validityText = item.isValid ? '유효' : '중복';
+                let setClass = item.setClass;
+
+                if (i>0 && new Date(item.date).getMonth() !== new Date(prevItem.date).getMonth()) {
+                    setClass += 'group-divider';
+                }
 
                 html += `
-                    <tr class="${item.setClass}">
+                    <tr class="${setClass}">
                         <td>${item.date}</td>
                         <td style="${item.style}">${item.itemName}</td>
                         <td style="${item.style}">${item.rarity}</td>
