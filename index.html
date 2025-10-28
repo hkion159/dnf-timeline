@@ -1031,13 +1031,14 @@
             let html = "";
             for (let i = 0; i < items.length; i++) {
                 const item = items[i];
-                const prevItem = items[Math.max(i-1,0)];
+                const prevItem = items[Math.max(i - 1, 0)];
                 const validityClass = item.isValid ? 'valid-true' : 'valid-false';
                 const validityText = item.isValid ? '유효' : '중복';
                 let setClass = item.setClass;
 
-                if (i>0 && new Date(item.date).getMonth() !== new Date(prevItem.date).getMonth()) {
+                if (i > 0 && new Date(item.date).getMonth() !== new Date(prevItem.date).getMonth()) {
                     setClass += 'group-divider';
+                    console.log('now', item.date, item.itemName, 'prev', prevItem.date, prevItem.itemName);
                 }
 
                 html += `
