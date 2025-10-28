@@ -689,6 +689,7 @@
                         const last = chanceSeqTimeline[seqLength - 1];
 
                         if (isValid !== last.isValid) {
+                            console.log('changed', 'last',last,'now',isValid, dropData.itemName);
                             const tempSeqTimeline = [...chanceSeqTimeline];
 
                             // 연속 정보 초기화
