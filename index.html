@@ -173,84 +173,77 @@
             font-weight: bold;
         }
 
-        /* 1. 컨테이너 설정: 가로로 나열 및 자동 줄 바꿈 */
+        /* 1. 컨테이너 설정: 가로 나열 및 자동 줄 바꿈 (이전과 동일) */
         .search-history-container {
-            /* Flexbox를 사용하여 내부 요소를 가로로 나열 */
             display: flex;
-            /* 핵심: 가로 공간이 부족할 때 다음 줄로 자동 줄 바꿈 */
             flex-wrap: wrap;
-
-            /* 요소들 사이에 약간의 간격 확보 */
             gap: 8px;
-            /* 태그 간의 가로/세로 간격 설정 */
-
-            /* 선택 사항: 컨테이너의 최대 너비 설정 (페이지 전체 너비를 사용하지 않도록) */
-            /* max-width: 800px; 
-    margin: 0 auto; */
-
             padding: 10px 0;
         }
 
-        /* 2. 개별 닉네임 태그 스타일: 작은 크기, 세로 고정 */
+        /* 2. 개별 닉네임 태그 스타일 (수정): 작은 크기, 세로 고정 */
         .nickname-tag {
-            /* Flex Item으로 설정 */
             display: inline-flex;
-            /* 세로 크기를 고정하고 내용을 가운데 정렬 */
             height: 28px;
             align-items: center;
 
-            /* 가로는 내용(텍스트 + 버튼)을 감싸도록 설정 (width 지정 안 함) */
-
             /* 디자인 스타일 */
             background-color: #f0f0f0;
-            /* 배경색 */
             border-radius: 14px;
-            /* 둥근 모양 */
+            /* 서버명 추가로 좌측 패딩을 10px로 유지 */
             padding: 0 5px 0 10px;
-            /* 좌우 패딩으로 가로 크기 확보 */
             font-size: 13px;
-            /* 작은 글꼴 크기 */
             color: #333;
 
-            /* 줄 바꿈을 막아 태그가 한 줄에 나오도록 */
             white-space: nowrap;
-            /* 상단 여백 설정 (자동 줄 바꿈 시 보기 좋게) */
             margin-bottom: 5px;
         }
 
-        /* 3. 닉네임 텍스트 */
+        /* 3. 서버 이름 스타일 (새로 추가) */
+        .server-name {
+            /* 닉네임보다 작게 표시하여 덜 강조 */
+            font-size: 11px;
+            color: #888;
+            /* 회색으로 처리하여 배경처럼 보이게 */
+            font-weight: normal;
+
+            /* 서버 이름과 닉네임을 구분하는 경계선 */
+            padding-right: 5px;
+            margin-right: 5px;
+            border-right: 1px solid #ccc;
+            /* 얇은 세로선 추가 */
+
+            /* 세로선 높이를 맞추기 위해 display 설정 */
+            display: inline-block;
+        }
+
+        /* 4. 닉네임 텍스트 (수정) */
         .nickname-text {
-            /* 텍스트와 버튼 사이에 약간의 간격 추가 */
+            /* 서버 이름이 패딩을 제공하므로, margin-right는 버튼과의 간격만 남김 */
+            font-weight: bold;
+            /* 닉네임을 강조 */
             margin-right: 5px;
         }
 
-        /* 4. 삭제 버튼 (x 버튼): 가장 작은 크기 */
+        /* 5. 삭제 버튼 (x 버튼): (이전과 동일) */
         .remove-btn {
-            /* 크기 및 모양 설정 */
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            /* 원형 */
             border: none;
             background-color: #ccc;
             color: white;
             font-size: 10px;
-            /* 매우 작은 폰트 */
             font-weight: bold;
             cursor: pointer;
-
-            /* 버튼 내부 텍스트 가운데 정렬 */
             display: flex;
             justify-content: center;
             align-items: center;
-
-            /* 호버 효과 */
             transition: background-color 0.2s;
         }
 
         .remove-btn:hover {
             background-color: #e00;
-            /* 마우스 오버 시 빨간색 */
         }
     </style>
 </head>
@@ -261,10 +254,12 @@
         <h1>던파 득템 유효성 검사기</h1>
         <div id="search-history-container" class="search-history-container">
             <div class="nickname-tag">
+                <span class="server-name">길드워2</span>
                 <span class="nickname-text">캐릭터닉네임A</span>
                 <button class="remove-btn">x</button>
             </div>
             <div class="nickname-tag">
+                <span class="server-name">WOW</span>
                 <span class="nickname-text">닉네임B</span>
                 <button class="remove-btn">x</button>
             </div>
@@ -274,46 +269,6 @@
             </div>
             <div class="nickname-tag">
                 <span class="nickname-text">ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ</span>
-                <button class="remove-btn">x</button>
-            </div>
-            <div class="nickname-tag">
-                <span class="nickname-text">ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ</span>
                 <button class="remove-btn">x</button>
             </div>
         </div>
