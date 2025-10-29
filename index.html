@@ -1744,8 +1744,10 @@
                     checkbox = matchingLabel.querySelector('input[type="checkbox"]');
                 }
 
+                console.log(matchingLabel, checkbox, checkbox.id);
+
                 allCheckboxes.forEach(cb => {
-                    if (!matchingLabel) cb.checked = false;
+                    if (!checkbox) cb.checked = false;
 
                     if (cb.id === checkbox.id) cb.checked = true;
                     else cb.checked = false;
