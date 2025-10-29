@@ -427,8 +427,8 @@
         .checkbox-list {
             display: flex;
 
-            /* ⭐️ 변경: 가로 나열 (기본값이 row이므로 생략 가능하나 명시적으로 지정) */
-            flex-direction: center;
+            /* ⭐️ 추가: 내부 Flex Item들을 가로축(main axis) 기준으로 중앙에 정렬 */
+            justify-content: center;
 
             /* ⭐️ 추가: 공간이 부족하면 다음 줄로 자동 줄 바꿈 */
             flex-wrap: wrap;
