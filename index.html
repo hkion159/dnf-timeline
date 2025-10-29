@@ -611,7 +611,8 @@
 
         <div id="status"></div>
         <div id="probResult" style="visibility:hidden;">
-            <h2 style="width: 50%; margin: 0 auto; text-align: center;">운: <span id="prob" class="highlight-primary"></span></h2>
+            <h2 style="width: 50%; margin: 0 auto; text-align: center;">운: <span id="prob"
+                    class="highlight-primary"></span></h2>
         </div>
         <table class="results-table">
             <thead>
@@ -1277,7 +1278,11 @@
             const upperPercent = Math.round(luckInfo.upperPercent);
             if (probSpan) {
                 probResultContainer.style.visibility = 'visible';
-                probSpan.textContent = `상위 ${upperPercent}% (하위 ${100 - upperPercent}%)`;
+                if (upperPercent < 50) {
+                    probSpan.textContent = `상위 ${upperPercent}%`;
+                } else {
+                    probSpan.textContent = `하위 ${100 - upperPercent}%`;
+                }
             }
         }
 
