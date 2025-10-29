@@ -354,6 +354,11 @@
             /* 또는 색상을 명확하게 구분 */
             /* border-bottom: 3px solid #007bff; */
         }
+
+        .results-table .newer-divider td {
+            /* 얇은 기본 테두리를 굵고 진한 테두리로 덮어씁니다. */
+            border-top: 3px solid #1a73e8;
+        }
     </style>
 </head>
 
@@ -652,7 +657,7 @@
             // 수집된 모든 아이템 ID에 대해 다중 조회 함수 호출
             await getTimelineItemDetails(allItemIds);
 
-            const result = [...timelines, ...allTimelineRows];
+            const result = [...(timelines.map((timeline) => ({ ...timeline, from: 'db' }))), ...(allTimelineRows.map((timeline) => ({ ...timeline, from: 'api' })))];
             await setTimelines(characterId, result);
 
             return result;
@@ -964,6 +969,8 @@
                     }
 
 
+
+
                     processedItems.push({
                         date: dropDate,
                         itemName: dropData.itemName,
@@ -1024,6 +1031,10 @@
 
                 if (i > 0 && new Date(item.date).getMonth() !== new Date(prevItem.date).getMonth()) {
                     setClass += ' group-divider';
+                }
+
+                if (i > 0 && item.from !== prevItem.from) {
+                    setClass += ' newer-divider';
                 }
 
                 html += `
