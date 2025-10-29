@@ -359,6 +359,101 @@
             /* 얇은 기본 테두리를 굵고 진한 테두리로 덮어씁니다. */
             border-top: 3px solid #1a73e8;
         }
+
+        /* 1. 전체 컨테이너 및 레이아웃 */
+        .selection-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: #ffffff;
+        }
+
+        /* 2. 제어 버튼 그룹 스타일 */
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            /* 버튼 간 간격 */
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            /* 아래 구분선 */
+        }
+
+        .select-btn {
+            /* 버튼 기본 디자인 */
+            padding: 8px 15px;
+            font-size: 14px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+            /* 버튼 내용이 줄바꿈되지 않도록 */
+        }
+
+        .select-btn:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        /* 2. ⭐️ 전체 선택 버튼 스타일 (긍정적 동작 - 녹색 계열) ⭐️ */
+        .select-all-btn {
+            background-color: #28a745;
+            /* 녹색 */
+            border-color: #28a745;
+        }
+
+        .select-all-btn:hover {
+            background-color: #1e7e34;
+            border-color: #1e7e34;
+        }
+
+        /* 3. ⭐️ 전체 해제 버튼 스타일 (중립적/부정적 동작 - 회색 계열) ⭐️ */
+        .deselect-all-btn {
+            background-color: #6c757d;
+            /* 회색 */
+            border-color: #6c757d;
+        }
+
+        .deselect-all-btn:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+        }
+
+        /* 3. 체크박스 리스트 스타일 */
+        .checkbox-list {
+            display: flex;
+            flex-direction: column;
+            /* 항목들을 세로로 나열 */
+            gap: 8px;
+            /* 항목 간 간격 */
+        }
+
+        .checkbox-list label {
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            padding: 5px 0;
+            cursor: pointer;
+            /* 레이블 클릭 시 체크박스 활성화 시각적 힌트 */
+            transition: background-color 0.1s;
+            border-radius: 3px;
+        }
+
+        /* 마우스 오버 시 미묘한 배경색 변화로 상호작용성 강조 */
+        .checkbox-list label:hover {
+            background-color: #f8f8f8;
+        }
+
+        /* 기본 체크박스 스타일은 브라우저에 맡기고, 여백만 조정 */
+        .checkbox-list input[type="checkbox"] {
+            margin-right: 8px;
+            /* 체크박스 자체의 크기를 조절하고 싶다면 appearance: none 후 커스텀 스타일 적용 필요 */
+        }
     </style>
 </head>
 
@@ -380,16 +475,79 @@
             <button id="searchButton" onclick="startSearch()">조회</button>
         </div>
 
-        <div id="rarityFilters" style="margin-top: 15px;">
-            <label>
-                <input type="checkbox" id="filterTaecho" value="태초" onchange="filterTimeline()" checked> 태초
-            </label>
-            <label>
-                <input type="checkbox" id="filterEpic" value="에픽" onchange="filterTimeline()" checked> 에픽
-            </label>
-            <label>
-                <input type="checkbox" id="filterLegendary" value="레전더리" onchange="filterTimeline()" checked> 레전더리
-            </label>
+        <div id="rarityFilters" class="selection-container" style="margin-top: 15px;">
+            <div class="checkbox-list">
+                <label>
+                    <input type="checkbox" id="filterTaecho" value="태초" onchange="filterTimeline()" checked> 태초
+                </label>
+                <label>
+                    <input type="checkbox" id="filterEpic" value="에픽" onchange="filterTimeline()" checked> 에픽
+                </label>
+                <label>
+                    <input type="checkbox" id="filterLegendary" value="레전더리" onchange="filterTimeline()" checked> 레전더리
+                </label>
+            </div>
+        </div>
+
+        <div id="setFilters" class="selection-container">
+            <div class="control-buttons">
+                <button id="select-only-mine" class="select-btn">내 세트만</button>
+                <button class="select-btn" data-target="group-left4">왼쪽 4개만</button>
+                <button class="select-btn" data-target="group-left8">왼쪽 8개만</button>
+                <button id="select-set-all" class="select-btn select-all-btn" data-target="group-all">전체 선택</button>
+                <button id="deselect-set-all" class="select-btn deselect-all-btn">전체 해제</button>
+            </div>
+
+            <div id="setCheckboxList" class="checkbox-list">
+                <label>
+                    <input type="checkbox" id="filterGold" value="영원히 이어지는 황금향 세트"
+                        data-group="group-left4 group-left8 group-all" onchange="filterTimeline()" checked> 황금향
+                </label>
+                <label>
+                    <input type="checkbox" id="filterCleanse" value="칠흑의 정화 세트"
+                        data-group="group-left4 group-left8 group-all" onchange="filterTimeline()" checked> 정화
+                </label>
+                <label>
+                    <input type="checkbox" id="filterDrake" value="용투장의 난 세트"
+                        data-group="group-left4 group-left8 group-all" onchange="filterTimeline()" checked> 용투
+                </label>
+                <label>
+                    <input type="checkbox" id="filterSeren" value="세렌디피티 세트"
+                        data-group="group-left4 group-left8 group-all" onchange="filterTimeline()" checked> 세렌
+                </label>
+                <label>
+                    <input type="checkbox" id="filterEtte" value="에테리얼 오브 아츠 세트" data-group="group-left8 group-all"
+                        onchange="filterTimeline()" checked> 에테
+                </label>
+                <label>
+                    <input type="checkbox" id="filterShadow" value="그림자에 숨은 죽음 세트" data-group="group-left8 group-all"
+                        onchange="filterTimeline()" checked> 그림자
+                </label>
+                <label>
+                    <input type="checkbox" id="filterVal" value="고대 전장의 발키리 세트" data-group="group-left8 group-all"
+                        onchange="filterTimeline()" checked> 발키리
+                </label>
+                <label>
+                    <input type="checkbox" id="filterFairy" value="소울 페어리 세트" data-group="group-left8 group-all"
+                        onchange="filterTimeline()" checked> 페어리
+                </label>
+                <label>
+                    <input type="checkbox" id="filterMa" value="마력의 영역 세트" data-group="group-all"
+                        onchange="filterTimeline()" checked> 마력
+                </label>
+                <label>
+                    <input type="checkbox" id="filterNature" value="압도적인 자연 세트" data-group="group-all"
+                        onchange="filterTimeline()" checked> 자연
+                </label>
+                <label>
+                    <input type="checkbox" id="filterTribe" value="무리 사냥의 길잡이 세트" data-group="group-all"
+                        onchange="filterTimeline()" checked> 무리
+                </label>
+                <label>
+                    <input type="checkbox" id="filterUnlimit" value="한계를 넘어선 에너지 세트" data-group="group-all"
+                        onchange="filterTimeline()" checked> 각몰
+                </label>
+            </div>
         </div>
 
         <p id="totalRowCount" style="font-weight: bold; margin: 10px 0;">총 타임라인 수: 0</p>
@@ -488,6 +646,8 @@
         };
 
         const lastTimelineDate = null;
+
+        const mySet = '';
 
         // --- DOM 요소 ---
         const charInput = document.getElementById('characterNameInput');
@@ -750,6 +910,7 @@
 
                 // 2. 모든 타임라인 데이터 가져오기 (월별)
                 const [set, allTimelineRows] = await Promise.all([getCharacterEquipment(characterId), getAllTimelinePages(characterId)]);
+                mySet = set;
 
                 if (allTimelineRows.length === 0) {
                     statusEl.textContent = "조회 기간 내 아이템 획득 기록이 없습니다.";
@@ -1087,8 +1248,34 @@
                 return;
             }
 
+            // 2. 체크된 세트(Sets) 확인
+            const checkedSets = [];
+            const setGold = document.getElementById('filterGold');
+            const setCleanse = document.getElementById('filterCleanse');
+            const setDrake = document.getElementById('filterDrake');
+            const setSeren = document.getElementById('filterSeren');
+            const setEtte = document.getElementById('filterEtte');
+            const setShadow = document.getElementById('filterShadow');
+            const setVal = document.getElementById('filterVal');
+            const setFairy = document.getElementById('filterFairy');
+            const setMa = document.getElementById('filterMa');
+            const setNature = document.getElementById('filterNature');
+            const setTribe = document.getElementById('filterTribe');
+            const setUnlimit = document.getElementById('filterUnlimit');
+
+            [setGold, setCleanse, setDrake, setSeren, setEtte, setShadow, setVal, setFairy, setMa, setNature, setTribe, setUnlimit]
+                .forEach((set) => {
+                    if (set.checked) checkedSets.push(set.value);
+                })
+
+            // 체크된 세트가 없으면 모든 데이터를 노출하지 않습니다.
+            if (checkedSets.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">선택된 아이템 등급이 없습니다.</td></tr>';
+                return;
+            }
+
             // 2. 전체 데이터를 순회하며 필터링
-            filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => isValidCode(row.code));
+            filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => checkedSets.includes(row.setName)).filter(row => isValidCode(row.code));
 
             displayResults();
         }
@@ -1489,6 +1676,55 @@
                 };
             });
         }
+
+        document.querySelector('.control-buttons').addEventListener('click', (event) => {
+            const targetButton = event.target;
+            if (!targetButton.classList.contains('select-btn')) return;
+
+            const allCheckboxes = document.querySelectorAll('#setCheckboxList input[type="checkbox"]');
+
+            if (targetButton.classList.contains('select-all-btn')) {
+                // 전체 선택
+                allCheckboxes.forEach(cb => cb.checked = true);
+                filterTimeline();
+                return;
+            }
+
+            if (targetButton.classList.contains('deselect-all-btn')) {
+                // 전체 해제
+                allCheckboxes.forEach(cb => cb.checked = false);
+                filterTimeline();
+                return;
+            }
+
+            // ⭐️ 특정 그룹 선택 로직 ⭐️
+            const singleTargetGroup = targetButton.dataset.target; // 버튼의 단일 타겟 그룹 (예: "group-a")
+
+            if (singleTargetGroup) {
+                allCheckboxes.forEach(cb => {
+                    // 1. 체크박스의 복수 그룹 문자열을 가져와 공백으로 분리하여 배열로 만듭니다.
+                    const checkboxGroups = cb.dataset.group ? cb.dataset.group.split(' ') : [];
+
+                    // 2. 체크박스 그룹 배열에 버튼의 단일 타겟 그룹이 포함되어 있는지 확인합니다.
+                    if (checkboxGroups.includes(singleTargetGroup)) {
+                        // 해당 체크박스가 타겟 그룹 중 하나라도 포함하고 있으면 선택
+                        cb.checked = true;
+                    } else {
+                        // 타겟 그룹에 속하지 않으면 해제
+                        cb.checked = false;
+                    }
+                });
+            } else if (targetButton.id === 'select-only-mine') {
+                allCheckboxes.forEach(cb => {
+                    if (cb.textContent.trim() === mySet) {
+                        cb.checked = true;
+                    } else {
+                        cb.checked = false;
+                    }
+                });
+            }
+            filterTimeline();
+        });
     </script>
 
 </body>
