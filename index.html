@@ -487,7 +487,7 @@
             <button id="searchButton" onclick="startSearch()">조회</button>
         </div>
 
-        <div id="rarityFilters" class="selection-container" style="margin-top: 15px;">
+        <div id="rarityFilters" class="selection-container">
             <div class="checkbox-list">
                 <label>
                     <input type="checkbox" id="filterTaecho" value="태초" onchange="filterTimeline()" checked> 태초
@@ -558,6 +558,17 @@
                 <label>
                     <input type="checkbox" id="filterUnlimit" value="한계를 넘어선 에너지 세트" data-group="group-all"
                         onchange="filterTimeline()" checked> 각몰
+                </label>
+            </div>
+        </div>
+
+        <div id="validFilters" class="selection-container">
+            <div class="checkbox-list">
+                <label>
+                    <input type="checkbox" id="filterValid" value="true" onchange="filterTimeline()" checked> 유효
+                </label>
+                <label>
+                    <input type="checkbox" id="filterInvalid" value="false" onchange="filterTimeline()" checked> 중복
                 </label>
             </div>
         </div>
@@ -1286,8 +1297,24 @@
                 return;
             }
 
+            // 3. 체크된 유효성 확인
+            const checkedValids = [];
+            const valid = document.getElementById('filterValid');
+            const invalid = document.getElementById('filterInvalid');
+
+            [valid, invalid]
+                .forEach((set) => {
+                    if (set.checked) checkedValids.push(JSON.parse(set.value));
+                })
+
+            // 체크된 세트가 없으면 모든 데이터를 노출하지 않습니다.
+            if (checkedValids.length === 0) {
+                resultsEl.innerHTML = '<tr><td colspan="8" style="text-align: center;">선택된 유효성이 없습니다.</td></tr>';
+                return;
+            }
+
             // 2. 전체 데이터를 순회하며 필터링
-            filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => checkedSets.includes(row.setName)).filter(row => isValidCode(row.code));
+            filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => checkedSets.includes(row.setName)).filter(row => checkedValids.includes(row.isValid)).filter(row => isValidCode(row.code));
 
             displayResults();
         }
