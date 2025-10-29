@@ -1256,7 +1256,7 @@
 
             // 체크된 등급이 없으면 모든 데이터를 노출하지 않습니다.
             if (checkedRarities.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">선택된 아이템 등급이 없습니다.</td></tr>';
+                resultsEl.innerHTML = '<tr><td colspan="8" style="text-align: center;">선택된 아이템 등급이 없습니다.</td></tr>';
                 return;
             }
 
@@ -1282,7 +1282,7 @@
 
             // 체크된 세트가 없으면 모든 데이터를 노출하지 않습니다.
             if (checkedSets.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">선택된 아이템 등급이 없습니다.</td></tr>';
+                resultsEl.innerHTML = '<tr><td colspan="8" style="text-align: center;">선택된 세트가 없습니다.</td></tr>';
                 return;
             }
 
