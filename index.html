@@ -1302,6 +1302,7 @@
             setSlotTracker = {};
 
             chanceSeqTimeline = [];
+            checkAllSetCheckboxes();
         }
 
         // ------------------------------------------------------------------
@@ -1687,6 +1688,10 @@
                     reject(`타임라인 조회 실패`, event.target.error)
                 };
             });
+        }
+
+        function checkAllSetCheckboxes() {
+            document.querySelectorAll('#setCheckboxList input[type=checkbox]').forEach(cb => cb.checked = true);
         }
 
         document.querySelector('.control-buttons').addEventListener('click', (event) => {
