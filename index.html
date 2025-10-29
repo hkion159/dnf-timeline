@@ -466,6 +466,27 @@
             margin-right: 8px;
             /* 체크박스 자체의 크기를 조절하고 싶다면 appearance: none 후 커스텀 스타일 적용 필요 */
         }
+
+        .highlight-primary {
+            /* 시선을 끄는 파란색 계열 배경 */
+            background-color: #007bff;
+            /* 파란색 */
+            color: white;
+            /* 흰색 텍스트 */
+
+            padding: 8px 12px;
+            border-radius: 6px;
+
+            font-size: 1.2em;
+            /* 주변 텍스트보다 약간 크게 */
+            font-weight: 900;
+            /* 매우 굵게 */
+
+            /* (선택 사항) 은은한 그림자 추가 */
+            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+
+            display: inline-block;
+        }
     </style>
 </head>
 
@@ -589,6 +610,9 @@
         </div>
 
         <div id="status"></div>
+        <div id="probResult" style="visibility:hidden;">
+            <h2>운: <span id="prob" class="highlight-primary"></span></h2>
+        </div>
         <table class="results-table">
             <thead>
                 <tr>
@@ -1163,6 +1187,7 @@
                         slot: itemTypeDetail,
                         isValid: isValid,
                         probabilityContent: probabilityContent,
+                        probability: roundedProbability,
                         styleClass: styleClass,
                         style: itemStyle,
                         resultClass: resultClass,
@@ -1195,12 +1220,17 @@
         // 결과 테이블에 표시
         function displayResults() {
             const items = filteredTimelinePages;
+
+            const probResultContainer = document.getElementById('probResult');
+            const probSpan = probResultContainer?.querySelector('span');
+
             // 최신순(내림차순)으로 정렬하여 표시
             // items.sort((a, b) => new Date(b.date) - new Date(a.date));
             if (items[0].date < items[items.length - 1].date) { items.reverse(); }
 
             if (items.length === 0) {
                 resultsEl.innerHTML = '<tr><td colspan="6">표시할 115레벨 세트 아이템이 없습니다.</td></tr>';
+                probResultContainer.style.visibility = 'hidden';
                 return;
             }
 
@@ -1241,6 +1271,14 @@
                 rowCountElement.textContent = `총 타임라인 수: ${items.length}`;
             }
 
+            const pList = items.map(item => item.probability / 100);
+            const results = items.map(item => item.isValid);
+            const luckInfo = luckPercent(pList, results);
+            const upperPercent = luckInfo.upperPercent;
+            if (probSpan) {
+                probResultContainer.style.visibility = 'visible';
+                probSpan.textContent = `상위 ${upperPercent}% (하위 ${1 - upperPercent}%)`;
+            }
         }
 
         // 날짜를 'YYYYMMDD' 형식의 문자열로 변환
@@ -1766,6 +1804,60 @@
             }
             filterTimeline();
         });
+
+        function luckPercent(pList, results) {
+            if (pList.length !== results.length) {
+                throw new Error("pList와 results의 길이가 같아야 합니다.");
+            }
+
+            const n = pList.length;
+
+            // 평균 (mu) = Σ p_i
+            const mu = pList.reduce((acc, p) => acc + p, 0);
+
+            // 분산 (sigma^2) = Σ p_i(1 - p_i)
+            const variance = pList.reduce((acc, p) => acc + p * (1 - p), 0);
+            const sigma = Math.sqrt(variance);
+
+            // 실제 성공 횟수
+            const xObs = results.reduce((acc, r) => acc + r, 0);
+
+            // z-score 계산
+            const z = (xObs - mu) / sigma;
+
+            // 표준정규분포 CDF (Φ(z)) 근사함수
+            const phi = (z) => 0.5 * (1 + erf(z / Math.SQRT2));
+
+            // erf (오차함수) 근사식
+            function erf(x) {
+                // Abramowitz and Stegun formula 7.1.26
+                const sign = x >= 0 ? 1 : -1;
+                x = Math.abs(x);
+
+                const a1 = 0.254829592;
+                const a2 = -0.284496736;
+                const a3 = 1.421413741;
+                const a4 = -1.453152027;
+                const a5 = 1.061405429;
+                const p = 0.3275911;
+
+                const t = 1 / (1 + p * x);
+                const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+                return sign * y;
+            }
+
+            // 상위 퍼센트 계산
+            const upperPercent = 100 * (1 - phi(z));
+
+            return {
+                successCount: xObs,
+                expected: mu,
+                zScore: z,
+                upperPercent: upperPercent,
+            };
+        }
+
     </script>
 
 </body>
