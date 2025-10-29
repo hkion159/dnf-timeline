@@ -1727,12 +1727,28 @@
                     }
                 });
             } else if (targetButton.id === 'select-only-mine' && mySet) {
+                const allCheckboxLabelContainer = document.getElementById('setCheckboxList');
+                const allCheckboxLabels = allCheckboxLabelContainer.querySelectorAll('label');
+
+                // 3. NodeList를 배열로 변환하고 find()를 사용하여 일치하는 label을 찾습니다.
+                const matchingLabel = Array.from(allCheckboxLabels).find(label => {
+                    // label.textContent.trim()을 사용하여 텍스트 앞뒤의 공백을 제거하고 비교합니다.
+                    return label.textContent.trim() === mySet;
+                });
+
+                let checkbox;
+                if (matchingLabel) {
+                    console.log(`✅ 일치하는 레이블을 찾았습니다:`, matchingLabel);
+
+                    // 일치하는 레이블 내의 체크박스를 조작할 수 있습니다.
+                    checkbox = matchingLabel.querySelector('input[type="checkbox"]');
+                }
+
                 allCheckboxes.forEach(cb => {
-                    if (cb.textContent.trim() === mySet) {
-                        cb.checked = true;
-                    } else {
-                        cb.checked = false;
-                    }
+                    if (!matchingLabel) cb.checked = false;
+
+                    if (cb.id === checkbox.id) cb.checked = true;
+                    else cb.checked = false;
                 });
             }
             filterTimeline();
