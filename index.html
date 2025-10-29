@@ -984,7 +984,8 @@
                         resultClass: resultClass,
                         resultText: resultText,
                         setClass: setClass,
-                        code: code
+                        code: code,
+                        from: dropData.from
                     });
                 }
 
@@ -992,8 +993,6 @@
                 // 🚨 전역 변수에 전체 데이터 저장 🚨
                 allTimelinePages = processedItems;
                 filterTimeline();
-                // 4. 결과 출력
-                displayResults();
 
             } catch (error) {
                 console.error(error);
