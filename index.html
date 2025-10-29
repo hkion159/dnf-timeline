@@ -427,21 +427,31 @@
         /* 3. 체크박스 리스트 스타일 */
         .checkbox-list {
             display: flex;
-            flex-direction: column;
-            /* 항목들을 세로로 나열 */
-            gap: 8px;
-            /* 항목 간 간격 */
+
+            /* ⭐️ 변경: 가로 나열 (기본값이 row이므로 생략 가능하나 명시적으로 지정) */
+            flex-direction: row;
+
+            /* ⭐️ 추가: 공간이 부족하면 다음 줄로 자동 줄 바꿈 */
+            flex-wrap: wrap;
+
+            /* 항목 간 간격 조정 */
+            gap: 10px;
+            /* 항목 간의 가로/세로 간격을 10px로 설정 */
+            padding-top: 5px;
         }
 
         .checkbox-list label {
             display: flex;
             align-items: center;
             font-size: 15px;
-            padding: 5px 0;
+            padding: 5px 8px;
+            /* 패딩을 약간 늘려 가독성 확보 */
             cursor: pointer;
-            /* 레이블 클릭 시 체크박스 활성화 시각적 힌트 */
             transition: background-color 0.1s;
             border-radius: 3px;
+
+            /* ⭐️ 추가: 체크박스들이 한 줄에 유지되도록 강제 */
+            white-space: nowrap;
         }
 
         /* 마우스 오버 시 미묘한 배경색 변화로 상호작용성 강조 */
@@ -1714,7 +1724,7 @@
                         cb.checked = false;
                     }
                 });
-            } else if (targetButton.id === 'select-only-mine') {
+            } else if (targetButton.id === 'select-only-mine' && mySet) {
                 allCheckboxes.forEach(cb => {
                     if (cb.textContent.trim() === mySet) {
                         cb.checked = true;
