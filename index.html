@@ -1728,8 +1728,6 @@
                 });
             } else if (targetButton.id === 'select-only-mine' && mySet) {
                 allCheckboxes.forEach(cb => {
-                    if (!checkbox) cb.checked = false;
-
                     if (cb.value === mySet) cb.checked = true;
                     else cb.checked = false;
                 });
