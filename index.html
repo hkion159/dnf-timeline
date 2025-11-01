@@ -619,6 +619,8 @@
             <thead>
                 <tr>
                     <th>획득 시간</th>
+                    <th>채널</th>
+                    <th>던전</th>
                     <th>아이템명</th>
                     <th>등급</th>
                     <th>세트</th>
@@ -678,7 +680,8 @@
 
         const VALID_SLOTS = ['상의', '머리어깨', '하의', '벨트', '신발', '팔찌', '목걸이', '반지', '보조장비', '마법석', '귀걸이'];
 
-        const VALID_CODES = [505, 507, 513];
+        // 던전드랍, 레이드보상, 던전카드보상, 항아리&상자
+        const VALID_CODES = [505, 507, 513, 504];
 
         // --- 설정 및 상수 ---
         // *** 프록시 서버의 기본 경로를 정의합니다. ***
@@ -1185,6 +1188,10 @@
 
 
 
+                    let dungeonName = dropData.dungeonName;
+                    if (!dungeonName && code === 507) {
+                        dungeonName = '레이드';
+                    }
 
                     processedItems.push({
                         date: dropDate,
@@ -1201,7 +1208,10 @@
                         resultText: resultText,
                         setClass: setClass,
                         code: code,
-                        from: itemDrop.from
+                        from: itemDrop.from,
+                        channelName: dropData.channelName,
+                        channelNo: dropData.channelNo,
+                        dungeonName: dropData.dungeonName
                     });
                 }
 
@@ -1233,7 +1243,7 @@
             if (items[0].date < items[items.length - 1].date) { items.reverse(); }
 
             if (items.length === 0) {
-                resultsEl.innerHTML = '<tr><td colspan="6">표시할 115레벨 세트 아이템이 없습니다.</td></tr>';
+                resultsEl.innerHTML = getEmptyRow('표시할 115레벨 세트 아이템이 없습니다.');
                 hiddenProbability();
                 return;
             }
@@ -1257,6 +1267,8 @@
                 html += `
                     <tr class="${setClass}">
                         <td>${item.date}</td>
+                        <td>${item.channelName ? `${item.channelName} ${item.channelNo}채` : '-'}</td>
+                        <td>${item.dungeonName || '-'}</td>
                         <td style="${item.style}">${item.itemName}</td>
                         <td style="${item.style}">${item.rarity}</td>
                         <td>${item.setName}</td>
@@ -1286,7 +1298,7 @@
                 } else {
                     probSpan.textContent = `하위 ${100 - upperPercent}%`;
                 }
-                probResultDetail.textContent = `(기대유효: ${Math.round(luckInfo.expected*10)/10}개, 유효: ${luckInfo.successCount}개)`;
+                probResultDetail.textContent = `(기대유효: ${Math.round(luckInfo.expected * 10) / 10}개, 유효: ${luckInfo.successCount}개)`;
             }
         }
 
@@ -1314,7 +1326,7 @@
 
             // 체크된 등급이 없으면 모든 데이터를 노출하지 않습니다.
             if (checkedRarities.length === 0) {
-                resultsEl.innerHTML = '<tr><td colspan="8" style="text-align: center;">선택된 아이템 등급이 없습니다.</td></tr>';
+                resultsEl.innerHTML = getEmptyRow('선택된 아이템 등급이 없습니다.');
                 hiddenProbability();
                 return;
             }
@@ -1341,7 +1353,7 @@
 
             // 체크된 세트가 없으면 모든 데이터를 노출하지 않습니다.
             if (checkedSets.length === 0) {
-                resultsEl.innerHTML = '<tr><td colspan="8" style="text-align: center;">선택된 세트가 없습니다.</td></tr>';
+                resultsEl.innerHTML = getEmptyRow('선택된 세트가 없습니다.');
                 hiddenProbability();
                 return;
             }
@@ -1358,7 +1370,7 @@
 
             // 체크된 세트가 없으면 모든 데이터를 노출하지 않습니다.
             if (checkedValids.length === 0) {
-                resultsEl.innerHTML = '<tr><td colspan="8" style="text-align: center;">선택된 유효성이 없습니다.</td></tr>';
+                resultsEl.innerHTML = getEmptyRow('선택된 유효성이 없습니다.');
                 hiddenProbability();
                 return;
             }
@@ -1876,7 +1888,11 @@
         }
 
         function getServerId(serverName) {
-            return serverData.find((serverInfo)=>serverInfo.serverName === serverName)?.serverId;
+            return serverData.find((serverInfo) => serverInfo.serverName === serverName)?.serverId;
+        }
+
+        function getEmptyRow(text) {
+            return `<tr><td colspan="10" style="text-align: center;">${text}</td></tr>`;
         }
 
     </script>
