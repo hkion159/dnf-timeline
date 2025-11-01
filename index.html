@@ -613,7 +613,7 @@
         <div id="status"></div>
         <div id="probResult" style="visibility:hidden;">
             <h2 style="width: 50%; margin: 0 auto; text-align: center;">총합운: <span id="prob"
-                    class="highlight-primary"></span></h2>
+                    class="highlight-primary"></span><span id="probDetail"></span></h2>
         </div>
         <table class="results-table">
             <thead>
@@ -705,6 +705,7 @@
         const resultsEl = document.getElementById('resultsContainer');
 
         const probResultContainer = document.getElementById('probResult');
+        const probResultDetail = document.getElementById('probDetail');
         const probSpan = probResultContainer?.querySelector('span');
 
         // DB 연결 객체를 저장할 변수 (전역적으로 사용)
@@ -1233,7 +1234,7 @@
 
             if (items.length === 0) {
                 resultsEl.innerHTML = '<tr><td colspan="6">표시할 115레벨 세트 아이템이 없습니다.</td></tr>';
-                probResultContainer.style.visibility = 'hidden';
+                hiddenProbability();
                 return;
             }
 
@@ -1285,6 +1286,7 @@
                 } else {
                     probSpan.textContent = `하위 ${100 - upperPercent}%`;
                 }
+                probResultDetail.textContent = `(평균: ${expected}개, 유효: ${successCount}개)`;
             }
         }
 
@@ -1870,6 +1872,7 @@
 
         function hiddenProbability() {
             probResultContainer.style.visibility = 'hidden';
+            probResultDetail.textContent = '';
         }
 
     </script>
