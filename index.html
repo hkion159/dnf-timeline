@@ -1562,7 +1562,7 @@
                 event.stopPropagation();
                 // IndexedDB 삭제 로직 (별도의 함수 필요)
                 console.log(`[${serverName}] ${nickname} 삭제 요청`);
-                deleteCharacter(serverName, nickname);
+                deleteCharacter(getServerId(serverName), nickname);
                 tagDiv.remove(); // DOM에서도 즉시 제거
             });
 
@@ -1580,7 +1580,7 @@
             startSearch();
         }
 
-        function deleteCharacter(serverName, nickname) {
+        function deleteCharacter(serverId, nickname) {
             const transaction = db.transaction([CHARACTER_STORE], 'readwrite');
             const store = transaction.objectStore(CHARACTER_STORE);
 
@@ -1589,9 +1589,9 @@
             getReq.onsuccess = (event) => {
                 const characterObject = event.target.result;
 
-                const character = characterObject[serverName][nickname];
+                const character = characterObject[serverId][nickname];
                 if (character) {
-                    delete characterObject[serverName][nickname];
+                    delete characterObject[serverId][nickname];
                     store.put(character, DEFAULT_ID);
                 }
             }
@@ -1873,6 +1873,10 @@
         function hiddenProbability() {
             probResultContainer.style.visibility = 'hidden';
             probResultDetail.textContent = '';
+        }
+
+        function getServerId(serverName) {
+            return serverData.find((serverInfo)=>serverInfo.serverName === serverName)?.serverId;
         }
 
     </script>
