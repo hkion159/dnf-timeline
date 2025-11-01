@@ -621,6 +621,7 @@
                     <th>획득 시간</th>
                     <th>채널</th>
                     <th>던전</th>
+                    <th>출처</th>
                     <th>아이템명</th>
                     <th>등급</th>
                     <th>세트</th>
@@ -1193,6 +1194,11 @@
                         dungeonName = '레이드';
                     }
 
+                    let dropper = '던전';
+                    if (code === 504) {
+                        dropper = '항아리';
+                    }
+
                     processedItems.push({
                         date: dropDate,
                         itemName: dropData.itemName,
@@ -1208,10 +1214,11 @@
                         resultText: resultText,
                         setClass: setClass,
                         code: code,
-                        from: itemDrop.from,
+                        from: itemDrop.from, // tell db
                         channelName: dropData.channelName,
                         channelNo: dropData.channelNo,
-                        dungeonName: dropData.dungeonName
+                        dungeonName: dropData.dungeonName,
+                        dropper: dropper
                     });
                 }
 
@@ -1269,6 +1276,7 @@
                         <td>${item.date}</td>
                         <td>${item.channelName ? `${item.channelName} ${item.channelNo}채` : '-'}</td>
                         <td>${item.dungeonName || '-'}</td>
+                        <td>${item.dropper}</td>
                         <td style="${item.style}">${item.itemName}</td>
                         <td style="${item.style}">${item.rarity}</td>
                         <td>${item.setName}</td>
@@ -1892,7 +1900,7 @@
         }
 
         function getEmptyRow(text) {
-            return `<tr><td colspan="10" style="text-align: center;">${text}</td></tr>`;
+            return `<tr><td colspan="11" style="text-align: center;">${text}</td></tr>`;
         }
 
     </script>
