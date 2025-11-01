@@ -583,6 +583,38 @@
             </div>
         </div>
 
+        <div id="dungeonFilters" class="selection-container">
+            <div class="checkbox-list">
+                <label>
+                    <input type="checkbox" id="filterHell" value="종말의 숭배자" onchange="filterTimeline()" checked> 종말의숭배자
+                </label>
+                <label>
+                    <input type="checkbox" id="filterAbyss" value="심연 : 종말의 숭배자" onchange="filterTimeline()" checked>
+                    심연의숭배자
+                </label>
+                <label>
+                    <input type="checkbox" id="filterEndgame" value="종말의 경계" onchange="filterTimeline()" checked> 종말의경계
+                </label>
+                <label>
+                    <input type="checkbox" id="filterRaid" value="507" onchange="filterTimeline()" checked> 레이드
+                </label>
+                <label>
+                    <input type="checkbox" id="filterEtc" value="etc" onchange="filterTimeline()" checked> 기타(상던,레기온)
+                </label>
+            </div>
+        </div>
+
+        <div id="dropperFilters" class="selection-container">
+            <div class="checkbox-list">
+                <label>
+                    <input type="checkbox" id="filterDungeon" value="던전" onchange="filterTimeline()" checked> 던전
+                </label>
+                <label>
+                    <input type="checkbox" id="filterPot" value="항아리" onchange="filterTimeline()" checked> 항아리
+                </label>
+            </div>
+        </div>
+
         <div id="validFilters" class="selection-container">
             <div class="checkbox-list">
                 <label>
@@ -701,6 +733,10 @@
         const lastTimelineDate = null;
 
         let mySet = '';
+
+        const DUNGEON_JONG = '종말의 숭배자';
+        const DUNGEON_SIM = '심연 : 종말의 숭배자';
+        const DUNGEON_ENDGAME = '종말의 경계';
 
         // --- DOM 요소 ---
         const charInput = document.getElementById('characterNameInput');
@@ -1383,8 +1419,62 @@
                 return;
             }
 
-            // 2. 전체 데이터를 순회하며 필터링
-            filteredTimelinePages = allTimelinePages.filter(row => checkedRarities.includes(row.rarity)).filter(row => checkedSets.includes(row.setName)).filter(row => checkedValids.includes(row.isValid)).filter(row => isValidCode(row.code));
+            // 4. 체크된 던전 확인
+            const checkedDungeons = [];
+            const hell = document.getElementById('filterHell');
+            const abyss = document.getElementById('filterAbyss');
+            const endgame = document.getElementById('filterEndgame');
+            const raid = document.getElementById('filterRaid');
+            const etc = document.getElementById('filterEtc');
+
+            [hell, abyss, endgame, raid, etc]
+                .forEach((set) => {
+                    if (set.checked) checkedDungeons.push(set.value);
+                })
+
+            // 체크된 던전이 없으면 모든 데이터를 노출하지 않습니다.
+            if (checkedDungeons.length === 0) {
+                resultsEl.innerHTML = getEmptyRow('선택된 던전이 없습니다.');
+                hiddenProbability();
+                return;
+            }
+
+            // 5. 체크된 출처 확인
+            const checkedDroppers = [];
+            const dungeon = document.getElementById('filterDungeon');
+            const pot = document.getElementById('filterPot');
+
+            [dungeon, pot]
+                .forEach((set) => {
+                    if (set.checked) checkedDroppers.push(set.value);
+                })
+
+            // 체크된 출처가 없으면 모든 데이터를 노출하지 않습니다.
+            if (checkedDroppers.length === 0) {
+                resultsEl.innerHTML = getEmptyRow('선택된 획득 출처가 없습니다.');
+                hiddenProbability();
+                return;
+            }
+
+            // 6. 전체 데이터를 순회하며 필터링
+            filteredTimelinePages = allTimelinePages
+                .filter(row => checkedRarities.includes(row.rarity))
+                .filter(row => checkedSets.includes(row.setName))
+                .filter(row => checkedValids.includes(row.isValid))
+                .filter(row => {
+                    const dungeon = row.dungeonName;
+                    const code = row.code;
+
+                    if (hell.checked && dungeon === DUNGEON_JONG) return true;
+                    if (abyss.checked && dungeon === DUNGEON_SIM) return true;
+                    if (endgame.checked && dungeon === DUNGEON_ENDGAME) return true;
+                    if (raid.checked && code === 507) return true;
+                    if (etc.checked && ![DUNGEON_JONG, DUNGEON_SIM, DUNGEON_ENDGAME].includes(dungeon)) return true;
+
+                    return false;
+                })
+                .filter(row => checkedDroppers.includes(row.dropper))
+                .filter(row => isValidCode(row.code));
 
             displayResults();
         }
