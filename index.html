@@ -1592,7 +1592,7 @@
                 const character = characterObject[serverId][nickname];
                 if (character) {
                     delete characterObject[serverId][nickname];
-                    store.put(character, DEFAULT_ID);
+                    store.put(characterObject, DEFAULT_ID);
                 }
             }
 
