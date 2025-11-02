@@ -1465,13 +1465,13 @@
                     const dungeon = row.dungeonName;
                     const code = row.code;
 
-                    if (hell.checked && dungeon === DUNGEON_JONG) return true;
-                    if (abyss.checked && dungeon === DUNGEON_SIM) return true;
-                    if (endgame.checked && dungeon === DUNGEON_ENDGAME) return true;
-                    if (raid.checked && code === 507) return true;
-                    if (etc.checked && ![DUNGEON_JONG, DUNGEON_SIM, DUNGEON_ENDGAME, '레이드'].includes(dungeon)) return true;
+                    if (dungeon === DUNGEON_JONG) return hell.checked;
+                    if (dungeon === DUNGEON_SIM) return abyss.checked;
+                    if (dungeon === DUNGEON_ENDGAME) return endgame.checked;
+                    if (code === 507) return raid.checked;
+                    if (dungeon && ![DUNGEON_JONG, DUNGEON_SIM, DUNGEON_ENDGAME, '레이드'].includes(dungeon)) return etc.checked;
 
-                    return false;
+                    return true;
                 })
                 .filter(row => checkedDroppers.includes(row.dropper))
                 .filter(row => isValidCode(row.code));
