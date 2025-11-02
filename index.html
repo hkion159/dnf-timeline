@@ -1432,13 +1432,6 @@
                     if (set.checked) checkedDungeons.push(set.value);
                 })
 
-            // 체크된 던전이 없으면 모든 데이터를 노출하지 않습니다.
-            if (checkedDungeons.length === 0) {
-                resultsEl.innerHTML = getEmptyRow('선택된 던전이 없습니다.');
-                hiddenProbability();
-                return;
-            }
-
             // 5. 체크된 출처 확인
             const checkedDroppers = [];
             const dungeon = document.getElementById('filterDungeon');
