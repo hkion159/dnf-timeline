@@ -626,7 +626,7 @@
             </div>
         </div>
 
-        <p id="totalRowCount" style="font-weight: bold; margin: 10px 0;">총 타임라인 수: 0</p>
+        <p id="totalRowCount" style="font-weight: bold; margin: 10px 0;">총 타임라인 수: 0</p> <button id="clear-timeline" class="select-btn deselect-all-btn">저장된 타임라인 제거</button>
 
         <div id="infoNotice"
             style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; background: url('https://img-api.neople.co.kr/df/servers/cain/characters/4ecd3f9eea4b6dd87044a9d9323efd20?zoom=1') no-repeat center; color: #333; border-radius: 4px;">
@@ -756,6 +756,8 @@
         const ITEM_STORE = 'items';
         const TIMELINE_STORE = 'timelines';
         const DEFAULT_ID = 1;
+
+        let currCharacterId;
 
         /**
  * 캐릭터명 입력창에서 Enter 키를 눌렀을 때 startSearch() 함수를 호출합니다.
@@ -996,6 +998,7 @@
                 // 1. 캐릭터 ID 가져오기
                 statusEl.textContent = "캐릭터 ID 조회 중...";
                 const characterId = await getCharacterId(characterName);
+                currCharacterId = characterId;
                 const el = document.getElementById('infoNotice');
                 el.style.background = `url('https://img-api.neople.co.kr/df/servers/${SERVER_ID}/characters/${characterId}?zoom=1') no-repeat center`
 
@@ -1870,6 +1873,30 @@
             });
         }
 
+        function deleteTimelines(characterId) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([TIMELINE_STORE], 'readwrite');
+                const store = transaction.objectStore(TIMELINE_STORE);
+
+                const getReq = store.get(DEFAULT_ID);
+
+                getReq.onsuccess = (event) => {
+                    const timelineObject = event.target.result || {};
+
+                    const putReq = store.put({ ...timelineObject, [characterId]: null }, DEFAULT_ID);
+
+                    putReq.onsuccess = (event) => {
+                        resolve(event.target.result);
+                    }
+                }
+
+                getReq.onerror = (event) => {
+                    console.error(`타임라인 조회 실패`, event);
+                    reject(`타임라인 조회 실패`, event.target.error)
+                };
+            });
+        }
+
         function checkAllSetCheckboxes() {
             document.querySelectorAll('#setCheckboxList input[type=checkbox]').forEach(cb => cb.checked = true);
         }
@@ -1986,10 +2013,15 @@
             return `<tr><td colspan="11" style="text-align: center;">${text}</td></tr>`;
         }
 
+        document.querySelector('#clear-timeline').addEventListener('click', () => {
+            if(currCharacterId){deleteTimelines(currCharacterId);}
+        });
+
     </script>
 
 </body>
 
 
 </html>
+
 
