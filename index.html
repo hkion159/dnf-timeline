@@ -873,7 +873,7 @@
 
                 statusEl.textContent = `${start.getFullYear()}년 ${start.getMonth() + 1}월 타임라인 조회 중...`;
 
-                const url = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters/${characterId}/timeline?limit=100&code=505,507,513,504,511,516,514,520&startDate=${startDateStr}&endDate=${endDateStr}`;
+                const url = `${PROXY_BASE_URL}/servers/${SERVER_ID}/characters/${characterId}/timeline?limit=100&code=505,507,513,504,511,516,514,520,515&startDate=${startDateStr}&endDate=${endDateStr}`;
 
                 try {
                     const response = await fetch(url);
@@ -1992,3 +1992,4 @@
 
 
 </html>
+
