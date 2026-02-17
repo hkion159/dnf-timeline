@@ -861,10 +861,18 @@
 
             await getTimelineItemDetails(allItemIds);
 
-            const result = [
+            // 기존 DB 데이터 + 새 API 데이터 합치면서 중복 제거
+            const merged = [
                 ...(timelines.map(t => ({ ...t, from: 'db' }))),
                 ...(allTimelineRows.map(t => ({ ...t, from: 'api' })))
             ];
+            const seen = new Set();
+            const result = merged.filter(t => {
+                const key = `${t.date}|${t.code}|${t.data?.itemId || t.data?.itemName}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
             await setTimelines(characterId, result);
 
             return result;
