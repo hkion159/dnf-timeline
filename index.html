@@ -174,8 +174,9 @@
             color: #333;
             white-space: nowrap;
             margin-bottom: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s, box-shadow 0.2s;
+            cursor: grab;
+            transition: background-color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
+            user-select: none;
         }
 
         .nickname-tag:hover {
@@ -185,12 +186,21 @@
 
         .nickname-tag:active {
             background-color: #ccc;
-            transform: translateY(1px);
         }
 
         .nickname-tag:focus {
             outline: none;
             border: 1px solid #007bff;
+        }
+
+        .nickname-tag.dragging {
+            opacity: 0.4;
+            cursor: grabbing;
+        }
+
+        .nickname-tag.drag-over {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px #007bff;
         }
 
         .server-name {
@@ -1028,6 +1038,144 @@
 
         // --- 검색 기록 태그 ---
 
+        // 태그 순서 localStorage 저장/로드
+        const TAG_ORDER_KEY = 'dnfTagOrder';
+
+        function getTagOrder() {
+            try {
+                return JSON.parse(localStorage.getItem(TAG_ORDER_KEY)) || [];
+            } catch { return []; }
+        }
+
+        function saveTagOrder() {
+            const container = document.querySelector('.search-history-container');
+            if (!container) return;
+            const order = Array.from(container.children).map(tag => tag.dataset.tagKey);
+            localStorage.setItem(TAG_ORDER_KEY, JSON.stringify(order));
+        }
+
+        function removeFromTagOrder(tagKey) {
+            const order = getTagOrder().filter(k => k !== tagKey);
+            localStorage.setItem(TAG_ORDER_KEY, JSON.stringify(order));
+        }
+
+        // 드래그 앤 드롭 상태
+        let dragSrcTag = null;
+
+        function handleDragStart(e) {
+            dragSrcTag = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.dataset.tagKey);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            if (this !== dragSrcTag) {
+                this.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave() {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            if (dragSrcTag && dragSrcTag !== this) {
+                const container = this.parentNode;
+                const allTags = Array.from(container.children);
+                const fromIdx = allTags.indexOf(dragSrcTag);
+                const toIdx = allTags.indexOf(this);
+                if (fromIdx < toIdx) {
+                    container.insertBefore(dragSrcTag, this.nextSibling);
+                } else {
+                    container.insertBefore(dragSrcTag, this);
+                }
+                saveTagOrder();
+            }
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.nickname-tag.drag-over').forEach(el => el.classList.remove('drag-over'));
+            dragSrcTag = null;
+        }
+
+        // 터치 드래그 지원
+        let touchSrcTag = null;
+        let touchClone = null;
+        let touchOffsetX = 0;
+        let touchOffsetY = 0;
+
+        function handleTouchStart(e) {
+            if (e.target.closest('.remove-btn')) return;
+            touchSrcTag = this;
+            const touch = e.touches[0];
+            const rect = this.getBoundingClientRect();
+            touchOffsetX = touch.clientX - rect.left;
+            touchOffsetY = touch.clientY - rect.top;
+
+            // 길게 누르면 드래그 시작
+            this._touchTimer = setTimeout(() => {
+                this.classList.add('dragging');
+                touchClone = this.cloneNode(true);
+                touchClone.style.cssText = `position:fixed;pointer-events:none;z-index:9999;opacity:0.8;left:${rect.left}px;top:${rect.top}px;margin:0;`;
+                document.body.appendChild(touchClone);
+            }, 200);
+        }
+
+        function handleTouchMove(e) {
+            if (!touchClone) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchClone.style.left = (touch.clientX - touchOffsetX) + 'px';
+            touchClone.style.top = (touch.clientY - touchOffsetY) + 'px';
+
+            // 드롭 대상 하이라이트
+            document.querySelectorAll('.nickname-tag.drag-over').forEach(el => el.classList.remove('drag-over'));
+            const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropTarget = elemBelow?.closest('.nickname-tag');
+            if (dropTarget && dropTarget !== touchSrcTag) {
+                dropTarget.classList.add('drag-over');
+            }
+        }
+
+        function handleTouchEnd(e) {
+            clearTimeout(this._touchTimer);
+            if (!touchClone) {
+                touchSrcTag = null;
+                return;
+            }
+
+            // 드롭 위치 결정
+            const touch = e.changedTouches[0];
+            const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropTarget = elemBelow?.closest('.nickname-tag');
+
+            if (dropTarget && dropTarget !== touchSrcTag) {
+                const container = dropTarget.parentNode;
+                const allTags = Array.from(container.children);
+                const fromIdx = allTags.indexOf(touchSrcTag);
+                const toIdx = allTags.indexOf(dropTarget);
+                if (fromIdx < toIdx) {
+                    container.insertBefore(touchSrcTag, dropTarget.nextSibling);
+                } else {
+                    container.insertBefore(touchSrcTag, dropTarget);
+                }
+                saveTagOrder();
+            }
+
+            // 정리
+            touchSrcTag.classList.remove('dragging');
+            document.querySelectorAll('.nickname-tag.drag-over').forEach(el => el.classList.remove('drag-over'));
+            touchClone.remove();
+            touchClone = null;
+            touchSrcTag = null;
+        }
+
         async function loadAndDisplayTags() {
             if (!db) return;
 
@@ -1038,24 +1186,47 @@
 
             try {
                 const characterList = await getCharacters();
+                const tagEntries = [];
                 characterList.forEach(charactersObject => {
                     for (const [serverId, serverCharacters] of Object.entries(charactersObject)) {
                         const serverInfo = serverData.find(s => s.serverId === serverId);
                         if (!serverInfo) continue;
                         Object.keys(serverCharacters).forEach(nickname => {
-                            const tag = createNicknameTag(serverInfo.serverName, nickname);
-                            container.appendChild(tag);
+                            const tagKey = `${serverId}|${nickname}`;
+                            tagEntries.push({ serverName: serverInfo.serverName, nickname, tagKey });
                         });
                     }
                 });
+
+                // 저장된 순서에 따라 정렬
+                const savedOrder = getTagOrder();
+                tagEntries.sort((a, b) => {
+                    const idxA = savedOrder.indexOf(a.tagKey);
+                    const idxB = savedOrder.indexOf(b.tagKey);
+                    // 저장 순서에 없는 항목은 뒤로
+                    if (idxA === -1 && idxB === -1) return 0;
+                    if (idxA === -1) return 1;
+                    if (idxB === -1) return -1;
+                    return idxA - idxB;
+                });
+
+                tagEntries.forEach(({ serverName, nickname, tagKey }) => {
+                    const tag = createNicknameTag(serverName, nickname, tagKey);
+                    container.appendChild(tag);
+                });
+
+                // 새로 추가된 태그를 포함하여 순서 저장
+                saveTagOrder();
             } catch (error) {
                 console.error("데이터 조회 및 태그 생성 중 오류 발생:", error);
             }
         }
 
-        function createNicknameTag(serverName, nickname) {
+        function createNicknameTag(serverName, nickname, tagKey) {
             const tagDiv = document.createElement('div');
             tagDiv.className = 'nickname-tag';
+            tagDiv.draggable = true;
+            tagDiv.dataset.tagKey = tagKey;
 
             const serverSpan = document.createElement('span');
             serverSpan.className = 'server-name';
@@ -1072,13 +1243,29 @@
             removeBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
                 deleteCharacter(getServerId(serverName), nickname);
+                removeFromTagOrder(tagKey);
                 tagDiv.remove();
             });
+
+            // 마우스 드래그 이벤트
+            tagDiv.addEventListener('dragstart', handleDragStart);
+            tagDiv.addEventListener('dragover', handleDragOver);
+            tagDiv.addEventListener('dragleave', handleDragLeave);
+            tagDiv.addEventListener('drop', handleDrop);
+            tagDiv.addEventListener('dragend', handleDragEnd);
+
+            // 터치 드래그 이벤트
+            tagDiv.addEventListener('touchstart', handleTouchStart, { passive: true });
+            tagDiv.addEventListener('touchmove', handleTouchMove, { passive: false });
+            tagDiv.addEventListener('touchend', handleTouchEnd);
 
             tagDiv.appendChild(serverSpan);
             tagDiv.appendChild(nicknameSpan);
             tagDiv.appendChild(removeBtn);
-            tagDiv.onclick = () => handleTagClick(serverName, nickname);
+            tagDiv.onclick = (e) => {
+                if (dragSrcTag || touchClone) return; // 드래그 중이면 클릭 무시
+                handleTagClick(serverName, nickname);
+            };
 
             return tagDiv;
         }
