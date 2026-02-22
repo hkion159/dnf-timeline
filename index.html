@@ -575,7 +575,7 @@
 
         // --- DB 상수 ---
         const DB_NAME = 'dnfTimeline';
-        const DB_VERSION = 1;
+        const DB_VERSION = 2;
         const CHARACTER_STORE = 'characters';
         const ITEM_STORE = 'items';
         const TIMELINE_STORE = 'timelines';
@@ -702,12 +702,79 @@
             request.onsuccess = (event) => {
                 db = event.target.result;
                 console.log('IndexedDB 연결 성공.');
-                loadAndDisplayTags();
+                migrateStorageV2().then(() => loadAndDisplayTags());
             };
 
             request.onerror = (event) => {
                 console.error('IndexedDB 연결 오류:', event.target.error);
             };
+        }
+
+        // 기존 데이터 용량 최적화 마이그레이션
+        const MIGRATE_KEY = 'dnfStorageMigratedV2';
+        async function migrateStorageV2() {
+            if (localStorage.getItem(MIGRATE_KEY)) return;
+            console.log('저장소 최적화 마이그레이션 시작...');
+            try {
+                // 아이템 스토어 최적화: 필요한 3개 필드만 남김
+                const itemObj = await new Promise((res, rej) => {
+                    const tx = db.transaction([ITEM_STORE], 'readonly');
+                    const req = tx.objectStore(ITEM_STORE).get(DEFAULT_ID);
+                    req.onsuccess = () => res(req.result || {});
+                    req.onerror = () => rej(req.error);
+                });
+                const slimItems = {};
+                for (const [id, val] of Object.entries(itemObj)) {
+                    if (!val || typeof val !== 'object') continue;
+                    slimItems[id] = {
+                        itemAvailableLevel: val.itemAvailableLevel,
+                        setItemName: val.setItemName || null,
+                        itemTypeDetail: val.itemTypeDetail
+                    };
+                }
+                await new Promise((res, rej) => {
+                    const tx = db.transaction([ITEM_STORE], 'readwrite');
+                    const req = tx.objectStore(ITEM_STORE).put(slimItems, DEFAULT_ID);
+                    req.onsuccess = () => res();
+                    req.onerror = () => rej(req.error);
+                });
+
+                // 타임라인 스토어 최적화: 필요한 필드만 남김
+                const tlObj = await new Promise((res, rej) => {
+                    const tx = db.transaction([TIMELINE_STORE], 'readonly');
+                    const req = tx.objectStore(TIMELINE_STORE).get(DEFAULT_ID);
+                    req.onsuccess = () => res(req.result || {});
+                    req.onerror = () => rej(req.error);
+                });
+                const slimTl = {};
+                for (const [charId, rows] of Object.entries(tlObj)) {
+                    if (!Array.isArray(rows)) continue;
+                    slimTl[charId] = rows.map(t => ({
+                        date: t.date,
+                        code: t.code,
+                        from: t.from,
+                        data: t.data ? {
+                            itemId: t.data.itemId,
+                            itemName: t.data.itemName,
+                            itemRarity: t.data.itemRarity,
+                            channelName: t.data.channelName,
+                            channelNo: t.data.channelNo,
+                            dungeonName: t.data.dungeonName
+                        } : t.data
+                    }));
+                }
+                await new Promise((res, rej) => {
+                    const tx = db.transaction([TIMELINE_STORE], 'readwrite');
+                    const req = tx.objectStore(TIMELINE_STORE).put(slimTl, DEFAULT_ID);
+                    req.onsuccess = () => res();
+                    req.onerror = () => rej(req.error);
+                });
+
+                localStorage.setItem(MIGRATE_KEY, Date.now().toString());
+                console.log('저장소 최적화 마이그레이션 완료.');
+            } catch (e) {
+                console.error('마이그레이션 오류:', e);
+            }
         }
 
         function getCharacters() {
@@ -883,7 +950,21 @@
                 seen.add(key);
                 return true;
             });
-            await setTimelines(characterId, result);
+            // 타임라인 row에서 필요한 필드만 저장하여 용량 최적화
+            const slimResult = result.map(t => ({
+                date: t.date,
+                code: t.code,
+                from: t.from,
+                data: t.data ? {
+                    itemId: t.data.itemId,
+                    itemName: t.data.itemName,
+                    itemRarity: t.data.itemRarity,
+                    channelName: t.data.channelName,
+                    channelNo: t.data.channelNo,
+                    dungeonName: t.data.dungeonName
+                } : t.data
+            }));
+            await setTimelines(characterId, slimResult);
 
             return result;
         }
@@ -958,7 +1039,13 @@
 
                 getReq.onsuccess = (event) => {
                     const itemObject = event.target.result || {};
-                    const result = { ...itemObject, [itemData.itemId]: itemData };
+                    // 필요한 필드만 저장하여 용량 최적화
+                    const slim = {
+                        itemAvailableLevel: itemData.itemAvailableLevel,
+                        setItemName: itemData.setItemName || null,
+                        itemTypeDetail: itemData.itemTypeDetail
+                    };
+                    const result = { ...itemObject, [itemData.itemId]: slim };
                     const putReq = store.put(result, DEFAULT_ID);
 
                     putReq.onsuccess = () => resolve();
